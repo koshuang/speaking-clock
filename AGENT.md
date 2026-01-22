@@ -195,6 +195,33 @@ direnv allow
 | `bug` | 程式錯誤 |
 | `enhancement` | 功能改進或新功能 |
 
+### Release 流程（release-please）
+
+本專案使用 [release-please](https://github.com/googleapis/release-please) 自動管理版本發布：
+
+**運作方式：**
+1. Push 到 `main` 分支時，release-please 會分析 commits
+2. 自動建立/更新 Release PR（包含 CHANGELOG 和版本更新）
+3. Merge Release PR 後自動建立 GitHub Release 和 git tag
+
+**Commit 類型與版本影響：**
+
+| Commit 類型 | Release Notes 區段 | 版本影響 |
+|-------------|-------------------|----------|
+| `feat:` | Features | Minor (0.x.0) |
+| `fix:` | Bug Fixes | Patch (0.0.x) |
+| `feat!:` 或 `BREAKING CHANGE:` | Breaking Changes | Major (x.0.0) |
+| `perf:` | Performance | Patch |
+| `refactor:` | Code Refactoring | 不觸發 |
+| `docs:` | Documentation | 不觸發 |
+| `chore:` | 隱藏 | 不觸發 |
+
+**相關檔案：**
+- `.github/workflows/release-please.yml` - GitHub Action
+- `release-please-config.json` - 設定檔
+- `.release-please-manifest.json` - 版本追蹤
+- `CHANGELOG.md` - 自動產生的變更日誌
+
 ## 重要檔案
 
 | 檔案 | 說明 |
@@ -202,6 +229,8 @@ direnv allow
 | `vite.config.ts` | Vite 設定，包含 PWA 配置 |
 | `tsconfig.app.json` | TypeScript 設定 |
 | `.github/workflows/deploy.yml` | GitHub Actions 部署設定 |
+| `.github/workflows/release-please.yml` | 自動 Release 設定 |
+| `release-please-config.json` | Release 設定檔 |
 | `docs/PRD.md` | 產品需求文件 |
 
 ## 注意事項
