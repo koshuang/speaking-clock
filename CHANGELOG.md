@@ -3,10 +3,26 @@
 ## [1.1.0](https://github.com/koshuang/speaking-clock/compare/v1.0.0...v1.1.0) (2026-01-22)
 
 
+### Bug Fixes
+
+* **timer**: align with system clock for precise announcements ([#2](https://github.com/koshuang/speaking-clock/issues/2))
+* **voices**: use addEventListener with proper cleanup for voiceschanged event ([#3](https://github.com/koshuang/speaking-clock/issues/3))
+* **useEffect**: split voice loading and restoration into separate hooks ([#4](https://github.com/koshuang/speaking-clock/issues/4))
+* **wakeLock**: track user intent with wantActiveRef for proper state sync ([#5](https://github.com/koshuang/speaking-clock/issues/5))
+
+
 ### Features
 
-* resolve all 14 GitHub issues ([9400c10](https://github.com/koshuang/speaking-clock/commit/9400c10c05675fd2ff7da076980528ca717d403c))
-* resolve all 14 GitHub issues ([51a6e0a](https://github.com/koshuang/speaking-clock/commit/51a6e0a77fc67f0f92cf44d44fa0510321eedaba))
+* **ui**: add visual feedback (pulse animation) during announcement ([#6](https://github.com/koshuang/speaking-clock/issues/6))
+* **ui**: display next announcement time in footer ([#7](https://github.com/koshuang/speaking-clock/issues/7))
+* **ui**: add voice loading state indicator ([#8](https://github.com/koshuang/speaking-clock/issues/8))
+* **ui**: add dark mode toggle with light/dark/system options ([#9](https://github.com/koshuang/speaking-clock/issues/9))
+* **ui**: improve voice name display with friendly region labels ([#10](https://github.com/koshuang/speaking-clock/issues/10))
+* **pwa**: add install prompt banner ([#11](https://github.com/koshuang/speaking-clock/issues/11))
+* **a11y**: add aria labels to all interactive controls ([#12](https://github.com/koshuang/speaking-clock/issues/12))
+* **ui**: make clock clickable to trigger announcement ([#13](https://github.com/koshuang/speaking-clock/issues/13))
+* **ui**: add checkmark to selected interval ([#14](https://github.com/koshuang/speaking-clock/issues/14))
+* **ui**: add onboarding guide for new users ([#15](https://github.com/koshuang/speaking-clock/issues/15))
 
 ## 1.0.0 (2026-01-22)
 
