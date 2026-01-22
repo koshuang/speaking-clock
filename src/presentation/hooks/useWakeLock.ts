@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { container } from '../../di/container'
 
 export function useWakeLock() {
@@ -6,6 +6,7 @@ export function useWakeLock() {
 
   const [isSupported, setIsSupported] = useState(false)
   const [isActive, setIsActive] = useState(false)
+  const wantActiveRef = useRef(false)
 
   useEffect(() => {
     setIsSupported(wakeLockManager.isSupported())
@@ -13,12 +14,14 @@ export function useWakeLock() {
   }, [wakeLockManager])
 
   const request = useCallback(async () => {
+    wantActiveRef.current = true
     const success = await wakeLockManager.request()
     setIsActive(success)
     return success
   }, [wakeLockManager])
 
   const release = useCallback(async () => {
+    wantActiveRef.current = false
     await wakeLockManager.release()
     setIsActive(false)
   }, [wakeLockManager])
@@ -26,9 +29,13 @@ export function useWakeLock() {
   // 當頁面重新可見時，重新請求 Wake Lock
   useEffect(() => {
     const handleVisibilityChange = async () => {
-      if (document.visibilityState === 'visible' && isActive) {
-        await wakeLockManager.request()
-        setIsActive(wakeLockManager.isActive())
+      if (document.visibilityState === 'visible') {
+        if (wantActiveRef.current) {
+          const success = await wakeLockManager.request()
+          setIsActive(success)
+        } else {
+          setIsActive(wakeLockManager.isActive())
+        }
       }
     }
 
@@ -36,7 +43,7 @@ export function useWakeLock() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [isActive, wakeLockManager])
+  }, [wakeLockManager])
 
   return { isSupported, isActive, request, release }
 }

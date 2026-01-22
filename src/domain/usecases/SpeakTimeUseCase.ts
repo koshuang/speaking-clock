@@ -11,9 +11,9 @@ export class SpeakTimeUseCase {
     this.timeFormatter = new TimeFormatter()
   }
 
-  execute(date: Date = new Date()): void {
+  execute(date: Date = new Date(), onEnd?: () => void): void {
     const text = this.timeFormatter.format(date)
-    this.speechSynthesizer.speak(text, this.selectedVoiceId)
+    this.speechSynthesizer.speak(text, this.selectedVoiceId, onEnd)
   }
 
   setVoice(voiceId: string): void {
