@@ -1,73 +1,146 @@
-# React + TypeScript + Vite
+# 語音報時器 Speaking Clock
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一款可安裝的網頁應用程式（PWA），提供定時語音報時功能。
 
-Currently, two official plugins are available:
+**線上體驗**: [https://koshuang.github.io/speaking-clock/](https://koshuang.github.io/speaking-clock/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 功能特色
 
-## React Compiler
+- **即時時鐘** - 顯示當前日期與時間，每秒更新
+- **定時報時** - 可設定 1、5、10、15、30、60 分鐘間隔自動報時
+- **語音合成** - 使用 Web Speech API 進行中文語音報時
+- **時段區分** - 凌晨、上午、下午、晚上智慧判斷
+- **螢幕常亮** - 支援 Screen Wake Lock API 防止螢幕關閉
+- **PWA 支援** - 可安裝到桌面或手機，支援離線使用
+- **設定記憶** - 自動保存用戶偏好設定
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> 詳細產品規格請參閱 [PRD 文件](./docs/PRD.md)
 
-## Expanding the ESLint configuration
+## 快速開始
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 安裝依賴
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 開發模式
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+### 建置
+
+```bash
+npm run build
+```
+
+### 執行測試
+
+```bash
+npm run test        # watch 模式
+npm run test:run    # 單次執行
+```
+
+## 專案架構
+
+採用 **Clean Architecture** 分層架構，確保核心業務邏輯獨立於框架與外部依賴：
+
+```
+src/
+├── domain/                    # 核心業務邏輯（無外部依賴）
+│   ├── entities/              # 資料模型
+│   │   ├── ClockSettings.ts   # 報時設定
+│   │   └── Voice.ts           # 語音資訊
+│   ├── usecases/              # 應用邏輯
+│   │   ├── TimeFormatter.ts   # 時間格式化
+│   │   ├── SpeakTimeUseCase.ts    # 報時用例
+│   │   └── ManageSettingsUseCase.ts # 設定管理用例
+│   └── ports/                 # 介面定義（依賴反轉）
+│       ├── SpeechSynthesizer.ts   # 語音合成介面
+│       ├── SettingsRepository.ts  # 設定儲存介面
+│       └── WakeLockManager.ts     # 螢幕常亮介面
+│
+├── infrastructure/            # 外部依賴實作
+│   ├── WebSpeechSynthesizer.ts        # Web Speech API 實作
+│   ├── LocalStorageSettingsRepository.ts # localStorage 實作
+│   └── ScreenWakeLockManager.ts       # Wake Lock API 實作
+│
+├── presentation/              # UI 層
+│   ├── hooks/                 # React Hooks
+│   │   ├── useSpeakingClock.ts
+│   │   └── useWakeLock.ts
+│   ├── components/            # React 元件
+│   │   └── App.tsx
+│   └── styles/                # 樣式
+│       └── App.css
+│
+└── di/                        # 依賴注入
+    └── container.ts           # DI 容器
+```
+
+### 架構優點
+
+| 層級 | 職責 | 優點 |
+|------|------|------|
+| Domain | 核心業務邏輯 | 無外部依賴，可獨立測試 |
+| Ports | 抽象介面定義 | 依賴反轉，方便替換實作 |
+| Infrastructure | 外部依賴實作 | 隔離瀏覽器 API |
+| Presentation | UI 邏輯 | 專注於畫面呈現 |
+| DI | 依賴注入 | 集中管理物件建立 |
+
+## 測試
+
+Domain 層 Use Case 已有完整單元測試：
+
+```
+✓ TimeFormatter.test.ts (15 tests)
+  - 時段判斷（凌晨、上午、下午、晚上）
+  - 小時格式化（12小時制）
+  - 分鐘格式化（整點 vs 非整點）
+
+✓ SpeakTimeUseCase.test.ts (6 tests)
+  - execute() 執行報時
+  - setVoice() 設定語音
+  - getVoices() 取得語音列表
+
+✓ ManageSettingsUseCase.test.ts (10 tests)
+  - load() / save() 設定存取
+  - updateInterval() 更新間隔
+  - toggleEnabled() 切換啟用狀態
+```
+
+## 技術棧
+
+| 類別 | 技術 |
+|------|------|
+| 框架 | React 19 |
+| 建置工具 | Vite 7 |
+| 語言 | TypeScript |
+| PWA | vite-plugin-pwa |
+| 測試 | Vitest |
+| 部署 | GitHub Pages + GitHub Actions |
+
+## 瀏覽器 API
+
+| API | 用途 |
+|-----|------|
+| [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) | 語音合成 |
+| [Screen Wake Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API) | 防止螢幕關閉 |
+| [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) | 儲存設定 |
+
+## 部署
+
+專案使用 GitHub Actions 自動部署到 GitHub Pages。每次推送到 `main` 分支會自動觸發部署。
+
+### 手動部署
+
+```bash
+npm run build
+# 將 dist/ 目錄部署到靜態網站服務
+```
+
+## 授權
+
+MIT License
