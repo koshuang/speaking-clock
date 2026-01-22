@@ -9,14 +9,22 @@ export function useSpeechSynthesis() {
       const availableVoices = speechSynthesis.getVoices()
       setVoices(availableVoices)
 
-      // 優先選擇中文語音
-      const chineseVoice = availableVoices.find(
-        (voice) => voice.lang.includes('zh') || voice.lang.includes('cmn')
+      // 優先選擇台灣繁體中文語音
+      const taiwanVoice = availableVoices.find(
+        (voice) => voice.lang === 'zh-TW' || voice.lang === 'zh_TW'
       )
-      if (chineseVoice) {
-        setSelectedVoice(chineseVoice)
-      } else if (availableVoices.length > 0) {
-        setSelectedVoice(availableVoices[0])
+      if (taiwanVoice) {
+        setSelectedVoice(taiwanVoice)
+      } else {
+        // 其次選擇任何中文語音
+        const chineseVoice = availableVoices.find(
+          (voice) => voice.lang.includes('zh') || voice.lang.includes('cmn')
+        )
+        if (chineseVoice) {
+          setSelectedVoice(chineseVoice)
+        } else if (availableVoices.length > 0) {
+          setSelectedVoice(availableVoices[0])
+        }
       }
     }
 
