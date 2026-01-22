@@ -9,46 +9,63 @@ export function useSpeakingClock() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [lastSpokenTime, setLastSpokenTime] = useState<Date | null>(null)
   const [voices, setVoices] = useState<Voice[]>([])
+  const [voicesLoading, setVoicesLoading] = useState(true)
+  const [isSpeaking, setIsSpeaking] = useState(false)
   const timerRef = useRef<number | null>(null)
+  const initialVoiceRestoredRef = useRef(false)
 
-  // 載入語音列表
+  // 載入語音列表（只負責載入，不處理選擇邏輯）
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = speechSynthesizer.getVoices()
       if (availableVoices.length === 0) return
 
       setVoices(availableVoices)
-
-      // 如果有已保存的語音 ID，檢查是否仍然可用
-      if (settings.voiceId) {
-        const savedVoice = availableVoices.find((v) => v.id === settings.voiceId)
-        if (savedVoice) {
-          speakTimeUseCase.setVoice(savedVoice.id)
-          return
-        }
-      }
-
-      // 沒有已保存的語音或已保存的語音不可用，選擇預設語音
-      const taiwanVoice = availableVoices.find(
-        (voice) => voice.lang === 'zh-TW' || voice.lang === 'zh_TW'
-      )
-      const chineseVoice = availableVoices.find(
-        (voice) => voice.lang.includes('zh') || voice.lang.includes('cmn')
-      )
-      const defaultVoice = taiwanVoice || chineseVoice || availableVoices[0]
-
-      // 保存預設語音選擇
-      const newSettings = manageSettingsUseCase.updateVoiceId(settings, defaultVoice.id)
-      setSettings(newSettings)
-      speakTimeUseCase.setVoice(defaultVoice.id)
+      setVoicesLoading(false)
     }
 
     loadVoices()
     // 某些瀏覽器需要等待 voiceschanged 事件
     if (typeof speechSynthesis !== 'undefined') {
-      speechSynthesis.onvoiceschanged = loadVoices
+      speechSynthesis.addEventListener('voiceschanged', loadVoices)
     }
-  }, [speechSynthesizer, speakTimeUseCase, manageSettingsUseCase, settings.voiceId])
+
+    return () => {
+      if (typeof speechSynthesis !== 'undefined') {
+        speechSynthesis.removeEventListener('voiceschanged', loadVoices)
+      }
+    }
+  }, [speechSynthesizer])
+
+  // 語音恢復邏輯（當語音列表載入後執行一次）
+  useEffect(() => {
+    if (voices.length === 0 || initialVoiceRestoredRef.current) return
+
+    initialVoiceRestoredRef.current = true
+
+    // 如果有已保存的語音 ID，檢查是否仍然可用
+    if (settings.voiceId) {
+      const savedVoice = voices.find((v) => v.id === settings.voiceId)
+      if (savedVoice) {
+        speakTimeUseCase.setVoice(savedVoice.id)
+        return
+      }
+    }
+
+    // 沒有已保存的語音或已保存的語音不可用，選擇預設語音
+    const taiwanVoice = voices.find(
+      (voice) => voice.lang === 'zh-TW' || voice.lang === 'zh_TW'
+    )
+    const chineseVoice = voices.find(
+      (voice) => voice.lang.includes('zh') || voice.lang.includes('cmn')
+    )
+    const defaultVoice = taiwanVoice || chineseVoice || voices[0]
+
+    // 保存預設語音選擇
+    const newSettings = manageSettingsUseCase.updateVoiceId(settings, defaultVoice.id)
+    setSettings(newSettings)
+    speakTimeUseCase.setVoice(defaultVoice.id)
+  }, [voices, settings.voiceId, speakTimeUseCase, manageSettingsUseCase, settings])
 
   // 更新當前時間（每秒更新顯示）
   useEffect(() => {
@@ -70,24 +87,35 @@ export function useSpeakingClock() {
 
     const checkAndSpeak = () => {
       const now = new Date()
+      const seconds = now.getSeconds()
       const minutes = now.getMinutes()
 
-      if (minutes % settings.interval === 0) {
+      // Only speak at the start of minutes (within first 2 seconds)
+      if (seconds < 2 && minutes % settings.interval === 0) {
         if (
           !lastSpokenTime ||
           now.getMinutes() !== lastSpokenTime.getMinutes() ||
           now.getHours() !== lastSpokenTime.getHours()
         ) {
-          speakTimeUseCase.execute(now)
+          setIsSpeaking(true)
+          speakTimeUseCase.execute(now, () => setIsSpeaking(false))
           setLastSpokenTime(now)
         }
       }
     }
 
-    checkAndSpeak()
-    timerRef.current = setInterval(checkAndSpeak, 60000)
+    // Align timer with system clock: start at next second boundary
+    const now = new Date()
+    const msUntilNextSecond = 1000 - now.getMilliseconds()
+
+    // Wait until next second boundary, then check every second
+    const alignmentTimeout = setTimeout(() => {
+      checkAndSpeak()
+      timerRef.current = setInterval(checkAndSpeak, 1000)
+    }, msUntilNextSecond)
 
     return () => {
+      clearTimeout(alignmentTimeout)
       if (timerRef.current) {
         clearInterval(timerRef.current)
       }
@@ -108,7 +136,8 @@ export function useSpeakingClock() {
   }, [manageSettingsUseCase, settings])
 
   const speakNow = useCallback(() => {
-    speakTimeUseCase.execute(new Date())
+    setIsSpeaking(true)
+    speakTimeUseCase.execute(new Date(), () => setIsSpeaking(false))
     setLastSpokenTime(new Date())
   }, [speakTimeUseCase])
 
@@ -128,6 +157,8 @@ export function useSpeakingClock() {
     toggleEnabled,
     speakNow,
     voices,
+    voicesLoading,
+    isSpeaking,
     selectedVoiceId: settings.voiceId ?? null,
     selectVoice,
   }

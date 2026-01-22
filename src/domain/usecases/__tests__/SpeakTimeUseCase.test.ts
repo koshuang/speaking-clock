@@ -25,6 +25,7 @@ describe('SpeakTimeUseCase', () => {
 
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         '現在時間 上午 10 點 30 分',
+        undefined,
         undefined
       )
     })
@@ -44,7 +45,8 @@ describe('SpeakTimeUseCase', () => {
 
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         '現在時間 下午 3 點整',
-        'voice1'
+        'voice1',
+        undefined
       )
     })
   })
@@ -56,7 +58,8 @@ describe('SpeakTimeUseCase', () => {
 
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         expect.any(String),
-        'voice2'
+        'voice2',
+        undefined
       )
     })
 
@@ -67,7 +70,8 @@ describe('SpeakTimeUseCase', () => {
 
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         expect.any(String),
-        'voice2'
+        'voice2',
+        undefined
       )
     })
   })
