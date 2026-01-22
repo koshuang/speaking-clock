@@ -20,7 +20,23 @@ export function useSpeakingClock() {
       const availableVoices = speechSynthesizer.getVoices()
       if (availableVoices.length === 0) return
 
-      setVoices(availableVoices)
+      // 排序語音列表：中文優先，然後按名稱排序
+      const sortedVoices = [...availableVoices].sort((a, b) => {
+        const aIsChinese = a.lang.includes('zh') || a.lang.includes('cmn')
+        const bIsChinese = b.lang.includes('zh') || b.lang.includes('cmn')
+        if (aIsChinese && !bIsChinese) return -1
+        if (!aIsChinese && bIsChinese) return 1
+        return a.name.localeCompare(b.name)
+      })
+
+      // 只在語音列表實際改變時才更新 state
+      setVoices((prev) => {
+        if (prev.length === sortedVoices.length &&
+            prev.every((v, i) => v.id === sortedVoices[i].id)) {
+          return prev // 沒變化，返回原陣列避免重新渲染
+        }
+        return sortedVoices
+      })
       setVoicesLoading(false)
     }
 
