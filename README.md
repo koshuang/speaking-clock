@@ -71,10 +71,9 @@ src/
 │   ├── hooks/                 # React Hooks
 │   │   ├── useSpeakingClock.ts
 │   │   └── useWakeLock.ts
-│   ├── components/            # React 元件
-│   │   └── App.tsx
-│   └── styles/                # 樣式
-│       └── App.css
+│   └── components/            # React 元件
+│       ├── ui/                # shadcn/ui 元件
+│       └── App.tsx
 │
 └── di/                        # 依賴注入
     └── container.ts           # DI 容器
@@ -118,6 +117,8 @@ Domain 層 Use Case 已有完整單元測試：
 | 框架 | React 19 |
 | 建置工具 | Vite 7 |
 | 語言 | TypeScript |
+| UI 元件庫 | shadcn/ui |
+| 樣式 | Tailwind CSS v4 |
 | PWA | vite-plugin-pwa |
 | 測試 | Vitest |
 | 部署 | GitHub Pages + GitHub Actions |

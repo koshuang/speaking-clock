@@ -1,5 +1,15 @@
 import { useSpeakingClock, useWakeLock } from '../hooks'
-import '../styles/App.css'
+import { Button } from '@/presentation/components/ui/button'
+import { Card, CardContent } from '@/presentation/components/ui/card'
+import { Toggle } from '@/presentation/components/ui/toggle'
+import { ToggleGroup, ToggleGroupItem } from '@/presentation/components/ui/toggle-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/presentation/components/ui/select'
 
 const INTERVAL_OPTIONS = [1, 5, 10, 15, 30, 60]
 
@@ -49,84 +59,114 @@ export function App() {
   }
 
   return (
-    <div className="app">
-      <header className="header">
-        <h1>語音報時器</h1>
-      </header>
+    <div className="min-h-screen bg-background p-4">
+      <div className="mx-auto max-w-md space-y-6">
+        {/* Header */}
+        <header className="pt-4 text-center">
+          <h1 className="text-2xl font-bold text-primary">語音報時器</h1>
+        </header>
 
-      <main className="main">
-        <section className="clock-display">
-          <div className="date">{formatDisplayDate(currentTime)}</div>
-          <div className="time">{formatDisplayTime(currentTime)}</div>
-        </section>
+        {/* Clock Display */}
+        <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+          <CardContent className="py-8 text-center">
+            <div className="text-sm opacity-90">{formatDisplayDate(currentTime)}</div>
+            <div className="mt-2 font-mono text-5xl font-bold tracking-wider">
+              {formatDisplayTime(currentTime)}
+            </div>
+          </CardContent>
+        </Card>
 
-        <section className="controls">
-          <div className="control-group">
-            <label>報時狀態</label>
-            <button
-              className={`toggle-btn ${settings.enabled ? 'active' : ''}`}
-              onClick={toggleEnabled}
-            >
-              {settings.enabled ? '已啟用' : '已停用'}
-            </button>
-          </div>
-
-          {wakeLockSupported && (
-            <div className="control-group">
-              <label>螢幕常亮</label>
-              <button
-                className={`toggle-btn ${wakeLockActive ? 'active' : ''}`}
-                onClick={toggleWakeLock}
+        {/* Controls */}
+        <Card>
+          <CardContent className="space-y-6">
+            {/* Announcement Toggle */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">報時狀態</span>
+              <Toggle
+                pressed={settings.enabled}
+                onPressedChange={toggleEnabled}
+                variant="outline"
+                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
               >
-                {wakeLockActive ? '已開啟' : '已關閉'}
-              </button>
-              <p className="hint">開啟後螢幕不會自動關閉，確保報時正常運作</p>
+                {settings.enabled ? '已啟用' : '已停用'}
+              </Toggle>
             </div>
-          )}
 
-          <div className="control-group">
-            <label>報時間隔</label>
-            <div className="interval-options">
-              {INTERVAL_OPTIONS.map((interval) => (
-                <button
-                  key={interval}
-                  className={`interval-btn ${settings.interval === interval ? 'selected' : ''}`}
-                  onClick={() => updateInterval(interval)}
-                >
-                  {interval} 分鐘
-                </button>
-              ))}
+            {/* Wake Lock Toggle */}
+            {wakeLockSupported && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">螢幕常亮</span>
+                  <Toggle
+                    pressed={wakeLockActive}
+                    onPressedChange={toggleWakeLock}
+                    variant="outline"
+                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
+                    {wakeLockActive ? '已開啟' : '已關閉'}
+                  </Toggle>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  開啟後螢幕不會自動關閉，確保報時正常運作
+                </p>
+              </div>
+            )}
+
+            {/* Interval Selection */}
+            <div className="space-y-2">
+              <span className="text-sm font-medium">報時間隔</span>
+              <ToggleGroup
+                type="single"
+                value={String(settings.interval)}
+                onValueChange={(value) => value && updateInterval(Number(value))}
+                variant="outline"
+                className="flex flex-wrap justify-start gap-2"
+              >
+                {INTERVAL_OPTIONS.map((interval) => (
+                  <ToggleGroupItem
+                    key={interval}
+                    value={String(interval)}
+                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
+                    {interval} 分鐘
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
             </div>
-          </div>
 
-          <div className="control-group">
-            <label>語音選擇</label>
-            <select
-              className="voice-select"
-              value={selectedVoiceId || ''}
-              onChange={(e) => selectVoice(e.target.value)}
-            >
-              {voices.map((voice) => (
-                <option key={voice.id} value={voice.id}>
-                  {voice.name} ({voice.lang})
-                </option>
-              ))}
-            </select>
-          </div>
+            {/* Voice Selection */}
+            <div className="space-y-2">
+              <span className="text-sm font-medium">語音選擇</span>
+              <Select value={selectedVoiceId || ''} onValueChange={selectVoice}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="選擇語音" />
+                </SelectTrigger>
+                <SelectContent>
+                  {voices.map((voice) => (
+                    <SelectItem key={voice.id} value={voice.id}>
+                      {voice.name} ({voice.lang})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <button className="speak-now-btn" onClick={speakNow}>
-            立即報時
-          </button>
-        </section>
-      </main>
+            {/* Speak Now Button */}
+            <Button onClick={speakNow} className="w-full" size="lg">
+              立即報時
+            </Button>
+          </CardContent>
+        </Card>
 
-      <footer className="footer">
-        <p>
-          {settings.enabled
-            ? `每 ${settings.interval} 分鐘報時一次`
-            : '報時已停用'}
-        </p>
-      </footer>
+        {/* Status Footer */}
+        <footer className="pb-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            {settings.enabled
+              ? `每 ${settings.interval} 分鐘報時一次`
+              : '報時已停用'}
+          </p>
+        </footer>
+      </div>
     </div>
   )
 }

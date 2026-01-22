@@ -82,6 +82,8 @@ src/
 | 框架 | React 19 | UI 框架 |
 | 建置工具 | Vite 7 | 快速開發與建置 |
 | 語言 | TypeScript | 型別安全 |
+| UI 元件庫 | shadcn/ui | 可客製化的 UI 元件 |
+| 樣式 | Tailwind CSS v4 | Utility-first CSS 框架 |
 | PWA | vite-plugin-pwa | Service Worker 與 Manifest |
 | 測試 | Vitest | 單元測試 |
 | 部署 | GitHub Pages | 靜態網站託管 |

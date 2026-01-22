@@ -37,7 +37,7 @@
 **語音報時器 (Speaking Clock)** 是一個 PWA 應用程式，使用 React + TypeScript 開發，採用 Clean Architecture 架構。
 
 - **線上版本**: https://koshuang.github.io/speaking-clock/
-- **技術棧**: React 19, Vite 7, TypeScript, Vitest
+- **技術棧**: React 19, Vite 7, TypeScript, shadcn/ui, Tailwind CSS v4, Vitest
 - **部署**: GitHub Pages (自動部署)
 
 ## 專案結構
@@ -56,8 +56,9 @@ src/
 │
 ├── presentation/              # UI 層 (React)
 │   ├── hooks/                 # useSpeakingClock, useWakeLock
-│   ├── components/            # App.tsx
-│   └── styles/                # CSS
+│   └── components/            # React 元件
+│       ├── ui/                # shadcn/ui 元件
+│       └── App.tsx
 │
 └── di/                        # 依賴注入容器
     └── container.ts
@@ -194,3 +195,24 @@ npm run preview    # 預覽建置結果
 2. 在 `infrastructure/` 實作
 3. 在 `di/container.ts` 註冊
 4. 撰寫測試
+
+### 新增 shadcn/ui 元件
+
+使用 shadcn CLI 安裝新元件：
+
+```bash
+npx shadcn@latest add <component-name>
+```
+
+常用元件：
+- `button` - 按鈕
+- `card` - 卡片容器
+- `select` - 下拉選單
+- `toggle` - 切換按鈕
+- `toggle-group` - 切換按鈕群組
+- `dialog` - 對話框
+- `input` - 輸入框
+
+元件會安裝到 `src/presentation/components/ui/`。
+
+查看所有可用元件：https://ui.shadcn.com/docs/components
