@@ -340,7 +340,7 @@ export function App() {
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={voicesLoading ? "載入語音中..." : "選擇語音"} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" className="max-h-60">
                   {voices.length === 0 ? (
                     <SelectItem value="none" disabled>
                       {voicesLoading ? "載入中..." : "無可用語音"}
