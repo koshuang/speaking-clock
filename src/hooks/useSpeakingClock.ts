@@ -37,7 +37,17 @@ function formatTime(date: Date): string {
   const hours = date.getHours()
   const minutes = date.getMinutes()
 
-  const period = hours < 12 ? '上午' : '下午'
+  let period: string
+  if (hours >= 0 && hours < 6) {
+    period = '凌晨'
+  } else if (hours >= 6 && hours < 12) {
+    period = '上午'
+  } else if (hours >= 12 && hours < 18) {
+    period = '下午'
+  } else {
+    period = '晚上'
+  }
+
   const displayHours = hours % 12 || 12
 
   if (minutes === 0) {
