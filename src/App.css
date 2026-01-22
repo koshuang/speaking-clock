@@ -1,0 +1,178 @@
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  color: #1976d2;
+  margin: 0;
+}
+
+.main {
+  flex: 1;
+}
+
+.clock-display {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #1976d2 0%, #2196f3 100%);
+  border-radius: 1rem;
+  color: white;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(25, 118, 210, 0.3);
+}
+
+.date {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-bottom: 0.5rem;
+}
+
+.time {
+  font-size: 3.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.controls {
+  background: #f5f5f5;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.control-group {
+  margin-bottom: 1.5rem;
+}
+
+.control-group:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.control-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #333;
+}
+
+.toggle-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  background: #e0e0e0;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: #4caf50;
+  color: white;
+}
+
+.toggle-btn:hover {
+  opacity: 0.9;
+}
+
+.interval-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.interval-btn {
+  padding: 0.75rem 0.5rem;
+  font-size: 0.9rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 0.5rem;
+  background: white;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.interval-btn.selected {
+  border-color: #1976d2;
+  background: #e3f2fd;
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.interval-btn:hover {
+  border-color: #1976d2;
+}
+
+.voice-select {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+}
+
+.voice-select:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+.speak-now-btn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  background: #1976d2;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.speak-now-btn:hover {
+  background: #1565c0;
+}
+
+.speak-now-btn:active {
+  transform: scale(0.98);
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem;
+  color: #666;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 400px) {
+  .time {
+    font-size: 2.5rem;
+  }
+
+  .interval-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
