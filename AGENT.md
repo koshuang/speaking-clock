@@ -152,6 +152,49 @@ npm run lint       # ESLint 檢查
 npm run preview    # 預覽建置結果
 ```
 
+### Claude 自訂指令
+
+| 指令 | 說明 |
+|------|------|
+| `/done` | 任務完成後的文件維護流程 |
+
+## 環境設定
+
+### direnv（專案環境變數）
+
+本專案使用 [direnv](https://direnv.net/) 管理專案專屬的環境變數，進入目錄時自動載入。
+
+```bash
+# 安裝 direnv（如尚未安裝）
+brew install direnv
+
+# 允許載入 .envrc
+direnv allow
+```
+
+**設定檔案：**
+- `.envrc` - 實際環境變數（已加入 .gitignore）
+- `.envrc.example` - 範本檔案
+
+**目前設定的變數：**
+- `GH_TOKEN` - GitHub Personal Access Token（用於 gh CLI）
+
+## 專案管理
+
+### GitHub Project
+
+專案使用 GitHub Project 看板管理任務：
+
+- **Project URL**: https://github.com/users/koshuang/projects/1
+- **方法論**: Kanban 看板
+
+### Issue 標籤
+
+| 標籤 | 說明 |
+|------|------|
+| `bug` | 程式錯誤 |
+| `enhancement` | 功能改進或新功能 |
+
 ## 重要檔案
 
 | 檔案 | 說明 |

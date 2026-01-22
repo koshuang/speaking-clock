@@ -1,0 +1,4 @@
+# GitHub Token for this project
+# Required scopes: repo, project
+# Create at: https://github.com/settings/tokens/new
+export GH_TOKEN="ghp_your_token_here"
