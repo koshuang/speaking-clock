@@ -2,6 +2,36 @@
 
 本文件提供 AI 助手（如 Claude）在此專案中進行開發時的指引與規範。
 
+---
+
+## ⚠️ 重要：開發前必讀
+
+**在進行任何功能開發之前，AI 必須先閱讀以下文件：**
+
+1. **[README.md](./README.md)** - 專案概述、功能特色、架構說明
+2. **[docs/PRD.md](./docs/PRD.md)** - 產品需求文件、功能規格
+3. **本文件 (AGENT.md)** - 開發規範與指引
+
+### 文件維護責任
+
+每次完成功能開發後，**必須評估並更新相關文件**：
+
+| 變更類型 | 需更新的文件 |
+|----------|--------------|
+| 新增使用者可見功能 | README.md（功能特色）、PRD.md（功能需求） |
+| 新增技術元件/API | README.md（技術棧、架構）、PRD.md（技術規格） |
+| 修改架構或目錄結構 | README.md（專案架構）、AGENT.md（專案結構） |
+| 新增測試 | README.md（測試章節） |
+| 新增設定選項 | PRD.md（功能需求表） |
+| Bug 修復 | 通常不需更新，除非涉及行為變更 |
+
+**範例**：若新增「自訂報時文字」功能，需要：
+- 更新 README.md 的「功能特色」
+- 更新 PRD.md 的功能需求表（將 P2 改為已實作）
+- 更新 AGENT.md 的擴展指引（如有新模式）
+
+---
+
 ## 專案概述
 
 **語音報時器 (Speaking Clock)** 是一個 PWA 應用程式，使用 React + TypeScript 開發，採用 Clean Architecture 架構。
@@ -49,11 +79,14 @@ src/
    ```
 
 3. **新增功能流程**
-   - 先在 `domain/ports/` 定義介面
-   - 在 `domain/usecases/` 實作業務邏輯
-   - 在 `infrastructure/` 實作外部依賴
-   - 在 `di/container.ts` 註冊依賴
-   - 在 `presentation/` 建立 UI
+   1. **閱讀文件** - 先閱讀 README.md、PRD.md、AGENT.md
+   2. **定義介面** - 在 `domain/ports/` 定義介面
+   3. **實作業務邏輯** - 在 `domain/usecases/` 實作
+   4. **撰寫測試** - 在 `domain/usecases/__tests__/` 撰寫單元測試
+   5. **實作外部依賴** - 在 `infrastructure/` 實作
+   6. **註冊依賴** - 在 `di/container.ts` 註冊
+   7. **建立 UI** - 在 `presentation/` 建立
+   8. **更新文件** - 視情況更新 README.md 和 PRD.md
 
 ### TypeScript 規範
 
