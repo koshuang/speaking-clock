@@ -6,6 +6,7 @@
 
 ## 功能特色
 
+### 核心功能
 - **即時時鐘** - 顯示當前日期與時間，每秒更新
 - **定時報時** - 可設定 1、5、10、15、30、60 分鐘間隔自動報時
 - **語音合成** - 使用 Web Speech API 進行中文語音報時
@@ -13,6 +14,15 @@
 - **螢幕常亮** - 支援 Screen Wake Lock API 防止螢幕關閉
 - **PWA 支援** - 可安裝到桌面或手機，支援離線使用
 - **設定記憶** - 自動保存用戶偏好設定
+
+### v1.1.0 新增功能
+- **深色模式** - 支援淺色/深色/系統主題切換
+- **視覺回饋** - 報時時時鐘卡片會有脈動動畫
+- **下次報時** - 頁尾顯示下次報時時間
+- **點擊報時** - 點擊時鐘即可立即報時
+- **PWA 安裝提示** - 自動顯示安裝提示橫幅
+- **無障礙支援** - 所有控制項皆有 ARIA 標籤
+- **新手導覽** - 首次使用顯示功能介紹
 
 > 詳細產品規格請參閱 [PRD 文件](./docs/PRD.md)
 
@@ -41,6 +51,7 @@ npm run build
 ```bash
 npm run test        # watch 模式
 npm run test:run    # 單次執行
+npm run init-prd    # 初始化 PRD 工作檔案
 ```
 
 ## 專案架構
@@ -48,35 +59,18 @@ npm run test:run    # 單次執行
 採用 **Clean Architecture** 分層架構，確保核心業務邏輯獨立於框架與外部依賴：
 
 ```
-src/
-├── domain/                    # 核心業務邏輯（無外部依賴）
-│   ├── entities/              # 資料模型
-│   │   ├── ClockSettings.ts   # 報時設定
-│   │   └── Voice.ts           # 語音資訊
-│   ├── usecases/              # 應用邏輯
-│   │   ├── TimeFormatter.ts   # 時間格式化
-│   │   ├── SpeakTimeUseCase.ts    # 報時用例
-│   │   └── ManageSettingsUseCase.ts # 設定管理用例
-│   └── ports/                 # 介面定義（依賴反轉）
-│       ├── SpeechSynthesizer.ts   # 語音合成介面
-│       ├── SettingsRepository.ts  # 設定儲存介面
-│       └── WakeLockManager.ts     # 螢幕常亮介面
-│
-├── infrastructure/            # 外部依賴實作
-│   ├── WebSpeechSynthesizer.ts        # Web Speech API 實作
-│   ├── LocalStorageSettingsRepository.ts # localStorage 實作
-│   └── ScreenWakeLockManager.ts       # Wake Lock API 實作
-│
-├── presentation/              # UI 層
-│   ├── hooks/                 # React Hooks
-│   │   ├── useSpeakingClock.ts
-│   │   └── useWakeLock.ts
-│   └── components/            # React 元件
-│       ├── ui/                # shadcn/ui 元件
-│       └── App.tsx
-│
-└── di/                        # 依賴注入
-    └── container.ts           # DI 容器
+speaking-clock/
+├── src/
+│   ├── domain/                # 核心業務邏輯（無外部依賴）
+│   ├── infrastructure/        # 外部依賴實作
+│   ├── presentation/          # UI 層
+│   └── di/                    # 依賴注入
+├── docs/
+│   ├── PRD.md                 # 產品需求文件
+│   └── templates/             # PRD 範本（團隊共享）
+├── scripts/
+│   └── init-prd.sh            # PRD 初始化腳本
+└── .omc/                      # 本地工作目錄（gitignore）
 ```
 
 ### 架構優點

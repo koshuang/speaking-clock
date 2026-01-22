@@ -43,25 +43,29 @@
 ## 專案結構
 
 ```
-src/
-├── domain/                    # 核心業務邏輯（純 TypeScript，無外部依賴）
-│   ├── entities/              # 資料模型 (ClockSettings, Voice)
-│   ├── usecases/              # 應用邏輯 (TimeFormatter, SpeakTimeUseCase, ManageSettingsUseCase)
-│   └── ports/                 # 介面定義 (SpeechSynthesizer, SettingsRepository, WakeLockManager)
+speaking-clock/
+├── src/
+│   ├── domain/                # 核心業務邏輯（純 TypeScript，無外部依賴）
+│   │   ├── entities/          # 資料模型 (ClockSettings, Voice)
+│   │   ├── usecases/          # 應用邏輯 (TimeFormatter, SpeakTimeUseCase, ManageSettingsUseCase)
+│   │   └── ports/             # 介面定義 (SpeechSynthesizer, SettingsRepository, WakeLockManager)
+│   ├── infrastructure/        # 外部依賴實作
+│   ├── presentation/          # UI 層 (React)
+│   │   ├── hooks/             # useSpeakingClock, useWakeLock
+│   │   └── components/        # React 元件
+│   └── di/                    # 依賴注入容器
 │
-├── infrastructure/            # 外部依賴實作
-│   ├── WebSpeechSynthesizer.ts        # Web Speech API
-│   ├── LocalStorageSettingsRepository.ts # localStorage
-│   └── ScreenWakeLockManager.ts       # Wake Lock API
+├── docs/
+│   ├── PRD.md                 # 產品需求文件
+│   └── templates/             # PRD 範本（團隊共享）
+│       ├── PRD-TEMPLATE.md    # 空白範本
+│       └── PRD-EXAMPLE.md     # 完整範例
 │
-├── presentation/              # UI 層 (React)
-│   ├── hooks/                 # useSpeakingClock, useWakeLock
-│   └── components/            # React 元件
-│       ├── ui/                # shadcn/ui 元件
-│       └── App.tsx
+├── scripts/
+│   └── init-prd.sh            # PRD 初始化腳本
 │
-└── di/                        # 依賴注入容器
-    └── container.ts
+└── .omc/                      # 本地工作目錄（gitignore）
+    └── prd.md                 # 實際執行的 PRD
 ```
 
 ## 開發規範
@@ -150,6 +154,7 @@ npm run test       # 執行測試 (watch)
 npm run test:run   # 執行測試 (單次)
 npm run lint       # ESLint 檢查
 npm run preview    # 預覽建置結果
+npm run init-prd   # 初始化 PRD 工作檔案
 ```
 
 ### Claude 自訂指令
@@ -157,6 +162,24 @@ npm run preview    # 預覽建置結果
 | 指令 | 說明 |
 |------|------|
 | `/done` | 任務完成後的文件維護流程 |
+| `/ralph-init` | 啟動 Ralph PRD 執行模式 |
+| `/ralph "task"` | 以持續模式執行任務直到完成 |
+
+### Ralph 工作流程
+
+使用 PRD 範本確保每個子任務有獨立 commit，以便 release-please 自動產生正確的 changelog：
+
+```bash
+# 1. 初始化 PRD
+npm run init-prd "Feature Name"
+
+# 2. 編輯 .omc/prd.md 填寫任務
+
+# 3. 啟動 Ralph
+/ralph-init
+```
+
+詳見 `docs/templates/PRD-TEMPLATE.md` 和 `docs/templates/PRD-EXAMPLE.md`。
 
 ## 環境設定
 
