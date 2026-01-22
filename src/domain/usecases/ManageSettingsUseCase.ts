@@ -27,4 +27,10 @@ export class ManageSettingsUseCase {
     this.save(newSettings)
     return newSettings
   }
+
+  updateVoiceId(currentSettings: ClockSettings, voiceId: string): ClockSettings {
+    const newSettings = { ...currentSettings, voiceId }
+    this.save(newSettings)
+    return newSettings
+  }
 }

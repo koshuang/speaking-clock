@@ -105,4 +105,35 @@ describe('ManageSettingsUseCase', () => {
       expect(currentSettings.enabled).toBe(false)
     })
   })
+
+  describe('updateVoiceId', () => {
+    it('應該更新語音 ID 並儲存', () => {
+      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const result = useCase.updateVoiceId(currentSettings, 'voice-123')
+
+      expect(result).toEqual({ interval: 30, enabled: false, voiceId: 'voice-123' })
+      expect(mockRepository.save).toHaveBeenCalledWith({
+        interval: 30,
+        enabled: false,
+        voiceId: 'voice-123',
+      })
+    })
+
+    it('應該保留其他設定不變', () => {
+      const currentSettings: ClockSettings = { interval: 15, enabled: true, voiceId: 'old-voice' }
+      const result = useCase.updateVoiceId(currentSettings, 'new-voice')
+
+      expect(result.interval).toBe(15)
+      expect(result.enabled).toBe(true)
+      expect(result.voiceId).toBe('new-voice')
+    })
+
+    it('應該回傳新的設定物件（不修改原物件）', () => {
+      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const result = useCase.updateVoiceId(currentSettings, 'voice-123')
+
+      expect(result).not.toBe(currentSettings)
+      expect(currentSettings.voiceId).toBeUndefined()
+    })
+  })
 })

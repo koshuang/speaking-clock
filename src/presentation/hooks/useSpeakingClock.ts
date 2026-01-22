@@ -9,27 +9,38 @@ export function useSpeakingClock() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [lastSpokenTime, setLastSpokenTime] = useState<Date | null>(null)
   const [voices, setVoices] = useState<Voice[]>([])
-  const [selectedVoiceId, setSelectedVoiceId] = useState<string | null>(null)
   const timerRef = useRef<number | null>(null)
 
   // 載入語音列表
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = speechSynthesizer.getVoices()
+      if (availableVoices.length === 0) return
+
       setVoices(availableVoices)
 
-      // 優先選擇台灣繁體中文語音
-      if (!selectedVoiceId && availableVoices.length > 0) {
-        const taiwanVoice = availableVoices.find(
-          (voice) => voice.lang === 'zh-TW' || voice.lang === 'zh_TW'
-        )
-        const chineseVoice = availableVoices.find(
-          (voice) => voice.lang.includes('zh') || voice.lang.includes('cmn')
-        )
-        const defaultVoice = taiwanVoice || chineseVoice || availableVoices[0]
-        setSelectedVoiceId(defaultVoice.id)
-        speakTimeUseCase.setVoice(defaultVoice.id)
+      // 如果有已保存的語音 ID，檢查是否仍然可用
+      if (settings.voiceId) {
+        const savedVoice = availableVoices.find((v) => v.id === settings.voiceId)
+        if (savedVoice) {
+          speakTimeUseCase.setVoice(savedVoice.id)
+          return
+        }
       }
+
+      // 沒有已保存的語音或已保存的語音不可用，選擇預設語音
+      const taiwanVoice = availableVoices.find(
+        (voice) => voice.lang === 'zh-TW' || voice.lang === 'zh_TW'
+      )
+      const chineseVoice = availableVoices.find(
+        (voice) => voice.lang.includes('zh') || voice.lang.includes('cmn')
+      )
+      const defaultVoice = taiwanVoice || chineseVoice || availableVoices[0]
+
+      // 保存預設語音選擇
+      const newSettings = manageSettingsUseCase.updateVoiceId(settings, defaultVoice.id)
+      setSettings(newSettings)
+      speakTimeUseCase.setVoice(defaultVoice.id)
     }
 
     loadVoices()
@@ -37,7 +48,7 @@ export function useSpeakingClock() {
     if (typeof speechSynthesis !== 'undefined') {
       speechSynthesis.onvoiceschanged = loadVoices
     }
-  }, [speechSynthesizer, speakTimeUseCase, selectedVoiceId])
+  }, [speechSynthesizer, speakTimeUseCase, manageSettingsUseCase, settings.voiceId])
 
   // 更新當前時間（每秒更新顯示）
   useEffect(() => {
@@ -103,10 +114,11 @@ export function useSpeakingClock() {
 
   const selectVoice = useCallback(
     (voiceId: string) => {
-      setSelectedVoiceId(voiceId)
+      const newSettings = manageSettingsUseCase.updateVoiceId(settings, voiceId)
+      setSettings(newSettings)
       speakTimeUseCase.setVoice(voiceId)
     },
-    [speakTimeUseCase]
+    [manageSettingsUseCase, settings, speakTimeUseCase]
   )
 
   return {
@@ -116,7 +128,7 @@ export function useSpeakingClock() {
     toggleEnabled,
     speakNow,
     voices,
-    selectedVoiceId,
+    selectedVoiceId: settings.voiceId ?? null,
     selectVoice,
   }
 }
