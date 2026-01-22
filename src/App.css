@@ -70,6 +70,12 @@
   color: #333;
 }
 
+.hint {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 0.5rem 0 0 0;
+}
+
 .toggle-btn {
   width: 100%;
   padding: 1rem;

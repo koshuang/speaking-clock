@@ -1,4 +1,5 @@
 import { useSpeakingClock } from './hooks/useSpeakingClock'
+import { useWakeLock } from './hooks/useWakeLock'
 import './App.css'
 
 const INTERVAL_OPTIONS = [1, 5, 10, 15, 30, 60]
@@ -14,6 +15,16 @@ function App() {
     selectedVoice,
     setSelectedVoice,
   } = useSpeakingClock()
+
+  const { isSupported: wakeLockSupported, isActive: wakeLockActive, request: requestWakeLock, release: releaseWakeLock } = useWakeLock()
+
+  const toggleWakeLock = async () => {
+    if (wakeLockActive) {
+      await releaseWakeLock()
+    } else {
+      await requestWakeLock()
+    }
+  }
 
   const formatDisplayTime = (date: Date) => {
     return date.toLocaleTimeString('zh-TW', {
@@ -55,6 +66,19 @@ function App() {
               {settings.enabled ? '已啟用' : '已停用'}
             </button>
           </div>
+
+          {wakeLockSupported && (
+            <div className="control-group">
+              <label>螢幕常亮</label>
+              <button
+                className={`toggle-btn ${wakeLockActive ? 'active' : ''}`}
+                onClick={toggleWakeLock}
+              >
+                {wakeLockActive ? '已開啟' : '已關閉'}
+              </button>
+              <p className="hint">開啟後螢幕不會自動關閉，確保報時正常運作</p>
+            </div>
+          )}
 
           <div className="control-group">
             <label>報時間隔</label>
