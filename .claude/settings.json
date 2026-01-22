@@ -1,0 +1,36 @@
+{
+  "project": {
+    "name": "speaking-clock",
+    "description": "語音報時器 PWA 應用程式",
+    "language": "zh-TW"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(git *)",
+      "Bash(mkdir *)",
+      "Bash(rm -rf dist)",
+      "Bash(rm -rf node_modules)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(sudo *)"
+    ]
+  },
+  "context": {
+    "includeFiles": [
+      "AGENT.md",
+      "README.md",
+      "docs/PRD.md",
+      "src/domain/**/*",
+      "package.json",
+      "tsconfig.app.json",
+      "vite.config.ts"
+    ],
+    "excludePatterns": [
+      "node_modules/**",
+      "dist/**",
+      "*.log"
+    ]
+  }
+}
