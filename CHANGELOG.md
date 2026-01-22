@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.1.1](https://github.com/koshuang/speaking-clock/compare/v1.1.0...v1.1.1) (2026-01-22)
+
+
+### Bug Fixes
+
+* **ui:** prevent voice dropdown from jumping during scroll ([dd2929c](https://github.com/koshuang/speaking-clock/commit/dd2929c9605502c87c2b6f2f61b8b2068cd79dcf))
+* **ui:** use popper position for voice dropdown ([#20](https://github.com/koshuang/speaking-clock/issues/20)) ([57b2374](https://github.com/koshuang/speaking-clock/commit/57b2374ca990247f6e145fa983a162ae8278cb93))
+
+
+### Documentation
+
+* add PRD templates for Ralph workflow ([9b4399e](https://github.com/koshuang/speaking-clock/commit/9b4399eb57a88a2b8f775dbf4342d8cea540bdf7))
+* update CHANGELOG.md with detailed v1.1.0 notes ([1b01de5](https://github.com/koshuang/speaking-clock/commit/1b01de5c6f5c3d787511561ce7f2a08fca11d453))
+* update documentation for v1.1.0 features ([dfe6b6b](https://github.com/koshuang/speaking-clock/commit/dfe6b6bf5d9fe0cda278c86e331606465296c06a))
+
 ## [1.1.0](https://github.com/koshuang/speaking-clock/compare/v1.0.0...v1.1.0) (2026-01-22)
 
 
