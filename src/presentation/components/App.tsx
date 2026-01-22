@@ -1,10 +1,9 @@
-import { useSpeakingClock } from './hooks/useSpeakingClock'
-import { useWakeLock } from './hooks/useWakeLock'
-import './App.css'
+import { useSpeakingClock, useWakeLock } from '../hooks'
+import '../styles/App.css'
 
 const INTERVAL_OPTIONS = [1, 5, 10, 15, 30, 60]
 
-function App() {
+export function App() {
   const {
     currentTime,
     settings,
@@ -12,11 +11,16 @@ function App() {
     toggleEnabled,
     speakNow,
     voices,
-    selectedVoice,
-    setSelectedVoice,
+    selectedVoiceId,
+    selectVoice,
   } = useSpeakingClock()
 
-  const { isSupported: wakeLockSupported, isActive: wakeLockActive, request: requestWakeLock, release: releaseWakeLock } = useWakeLock()
+  const {
+    isSupported: wakeLockSupported,
+    isActive: wakeLockActive,
+    request: requestWakeLock,
+    release: releaseWakeLock,
+  } = useWakeLock()
 
   const toggleWakeLock = async () => {
     if (wakeLockActive) {
@@ -99,14 +103,11 @@ function App() {
             <label>語音選擇</label>
             <select
               className="voice-select"
-              value={selectedVoice?.name || ''}
-              onChange={(e) => {
-                const voice = voices.find((v) => v.name === e.target.value)
-                if (voice) setSelectedVoice(voice)
-              }}
+              value={selectedVoiceId || ''}
+              onChange={(e) => selectVoice(e.target.value)}
             >
               {voices.map((voice) => (
-                <option key={voice.name} value={voice.name}>
+                <option key={voice.id} value={voice.id}>
                   {voice.name} ({voice.lang})
                 </option>
               ))}
@@ -129,5 +130,3 @@ function App() {
     </div>
   )
 }
-
-export default App
