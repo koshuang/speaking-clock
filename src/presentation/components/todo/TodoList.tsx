@@ -19,7 +19,7 @@ interface TodoListProps {
   todos: Todo[]
   nextTodoId: string | null
   onToggle: (id: string) => void
-  onUpdate: (id: string, text: string) => void
+  onUpdate: (id: string, text: string, icon?: string) => void
   onRemove: (id: string) => void
   onReorder: (fromIndex: number, toIndex: number) => void
 }
