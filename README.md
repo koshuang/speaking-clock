@@ -31,7 +31,7 @@
 - **無障礙支援** - 所有控制項皆有 ARIA 標籤
 - **新手導覽** - 首次使用顯示功能介紹
 
-> 詳細產品規格請參閱 [PRD 文件](./docs/PRD.md)
+> 詳細產品規格請參閱 [PRD 文件](./docs/PRD.md) | [UI/UX 設計指南](./docs/UI-UX-DESIGN-GUIDE.md)
 
 ## 快速開始
 
