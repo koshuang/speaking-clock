@@ -33,6 +33,7 @@ export function IconPicker({ value, onChange, size = 'default' }: IconPickerProp
           size="icon"
           className={buttonSize}
           aria-label="選擇圖示"
+          title="選擇圖示"
         >
           {value ? (
             <TodoIcon name={value} size={iconSize} />
@@ -47,20 +48,22 @@ export function IconPicker({ value, onChange, size = 'default' }: IconPickerProp
         side="bottom"
         collisionPadding={8}
       >
-        {/* Category tabs */}
-        <div className="flex flex-wrap gap-1 p-2 border-b bg-muted/30">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              type="button"
-              variant={selectedCategory === category ? 'secondary' : 'ghost'}
-              size="sm"
-              className="h-7 px-2 text-xs"
-              onClick={() => setSelectedCategory(category)}
-            >
-              {TODO_ICON_LABELS[category]}
-            </Button>
-          ))}
+        {/* Category tabs - horizontal scroll */}
+        <div className="overflow-x-auto border-b bg-muted/30 scrollbar-thin">
+          <div className="flex gap-1 p-2 min-w-max">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                type="button"
+                variant={selectedCategory === category ? 'secondary' : 'ghost'}
+                size="sm"
+                className="h-7 px-2 text-xs whitespace-nowrap"
+                onClick={() => setSelectedCategory(category)}
+              >
+                {TODO_ICON_LABELS[category]}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Icons grid for selected category */}
