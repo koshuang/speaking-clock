@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/koshuang/speaking-clock/compare/v1.1.1...v1.2.0) (2026-01-23)
+
+
+### Features
+
+* add todo reminder feature ([0634233](https://github.com/koshuang/speaking-clock/commit/0634233bbab178cb3d22d8f3e52ad11519c7bf49))
+
 ## [1.1.1](https://github.com/koshuang/speaking-clock/compare/v1.1.0...v1.1.1) (2026-01-22)
 
 
