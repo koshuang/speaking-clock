@@ -102,7 +102,9 @@ export function TodoItem({ todo, isNext, onToggle, onUpdate, onRemove }: TodoIte
         </div>
       ) : (
         <>
-          {todo.icon && <TodoIcon name={todo.icon} size={18} className="text-primary" />}
+          <span className="w-[18px] shrink-0 flex justify-center">
+            {todo.icon && <TodoIcon name={todo.icon} size={18} className="text-primary" />}
+          </span>
           <span
             className={`flex-1 text-sm ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
           >
