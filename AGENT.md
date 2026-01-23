@@ -46,13 +46,13 @@
 speaking-clock/
 ├── src/
 │   ├── domain/                # 核心業務邏輯（純 TypeScript，無外部依賴）
-│   │   ├── entities/          # 資料模型 (ClockSettings, Voice)
-│   │   ├── usecases/          # 應用邏輯 (TimeFormatter, SpeakTimeUseCase, ManageSettingsUseCase)
-│   │   └── ports/             # 介面定義 (SpeechSynthesizer, SettingsRepository, WakeLockManager)
-│   ├── infrastructure/        # 外部依賴實作
+│   │   ├── entities/          # 資料模型（設定、語音、待辦）
+│   │   ├── usecases/          # 應用邏輯（報時、設定管理、待辦管理、語音提醒）
+│   │   └── ports/             # 介面定義（語音合成、儲存庫、螢幕鎖定）
+│   ├── infrastructure/        # 外部依賴實作（Web Speech API、localStorage）
 │   ├── presentation/          # UI 層 (React)
-│   │   ├── hooks/             # useSpeakingClock, useWakeLock
-│   │   └── components/        # React 元件
+│   │   ├── hooks/             # React Hooks（報時控制、螢幕鎖定、待辦管理）
+│   │   └── components/        # React 元件（時鐘、控制面板、待辦清單）
 │   └── di/                    # 依賴注入容器
 │
 ├── docs/
@@ -307,7 +307,20 @@ npx shadcn@latest add <component-name>
 - `toggle-group` - 切換按鈕群組
 - `dialog` - 對話框
 - `input` - 輸入框
+- `checkbox` - 核取方塊
 
 元件會安裝到 `src/presentation/components/ui/`。
+
+### 新增拖曳排序功能
+
+使用 dnd-kit 套件實作拖曳排序：
+
+```bash
+npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
+```
+
+參考 `src/presentation/components/todo/` 的實作：
+- `TodoList.tsx` - DndContext 和 SortableContext 容器
+- `TodoItem.tsx` - useSortable hook 使用範例
 
 查看所有可用元件：https://ui.shadcn.com/docs/components

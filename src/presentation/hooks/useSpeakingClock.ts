@@ -2,7 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ClockSettings, Voice } from '../../domain'
 import { container } from '../../di/container'
 
-export function useSpeakingClock() {
+export interface UseSpeakingClockOptions {
+  onTimeSpoken?: () => void
+}
+
+export function useSpeakingClock(options?: UseSpeakingClockOptions) {
   const { speakTimeUseCase, manageSettingsUseCase, speechSynthesizer } = container
 
   const [settings, setSettings] = useState<ClockSettings>(() => manageSettingsUseCase.load())
@@ -114,7 +118,10 @@ export function useSpeakingClock() {
           now.getHours() !== lastSpokenTime.getHours()
         ) {
           setIsSpeaking(true)
-          speakTimeUseCase.execute(now, () => setIsSpeaking(false))
+          speakTimeUseCase.execute(now, () => {
+            setIsSpeaking(false)
+            options?.onTimeSpoken?.()
+          })
           setLastSpokenTime(now)
         }
       }
@@ -136,7 +143,7 @@ export function useSpeakingClock() {
         clearInterval(timerRef.current)
       }
     }
-  }, [settings.enabled, settings.interval, speakTimeUseCase, lastSpokenTime])
+  }, [settings.enabled, settings.interval, speakTimeUseCase, lastSpokenTime, options])
 
   const updateInterval = useCallback(
     (interval: number) => {
@@ -153,9 +160,12 @@ export function useSpeakingClock() {
 
   const speakNow = useCallback(() => {
     setIsSpeaking(true)
-    speakTimeUseCase.execute(new Date(), () => setIsSpeaking(false))
+    speakTimeUseCase.execute(new Date(), () => {
+      setIsSpeaking(false)
+      options?.onTimeSpoken?.()
+    })
     setLastSpokenTime(new Date())
-  }, [speakTimeUseCase])
+  }, [speakTimeUseCase, options])
 
   const selectVoice = useCallback(
     (voiceId: string) => {

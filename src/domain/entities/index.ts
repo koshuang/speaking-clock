@@ -1,3 +1,5 @@
 export type { ClockSettings } from './ClockSettings'
 export { DEFAULT_CLOCK_SETTINGS } from './ClockSettings'
 export type { Voice } from './Voice'
+export type { Todo, TodoList } from './Todo'
+export { DEFAULT_TODO_LIST } from './Todo'

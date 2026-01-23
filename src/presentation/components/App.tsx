@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useSpeakingClock, useWakeLock } from '../hooks'
+import { useState, useEffect, useCallback } from 'react'
+import { useSpeakingClock, useWakeLock, useTodos } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
 import { Toggle } from '@/presentation/components/ui/toggle'
@@ -17,8 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/presentation/components/ui/dropdown-menu'
-import { Moon, Sun, Monitor, Download, Check } from 'lucide-react'
+import { Moon, Sun, Monitor, Download, Check, ListTodo } from 'lucide-react'
 import type { Voice } from '@/domain/entities/Voice'
+import { TodoForm, TodoList } from './todo'
 
 const INTERVAL_OPTIONS = [1, 5, 10, 15, 30, 60]
 
@@ -67,6 +68,27 @@ export function App() {
   }
 
   const {
+    todos,
+    addTodo,
+    updateTodo,
+    removeTodo,
+    toggleTodo,
+    reorderTodos,
+    nextUncompletedTodo,
+    setVoice: setTodoVoice,
+    speakReminder,
+  } = useTodos()
+
+  const [isSpeakingReminder, setIsSpeakingReminder] = useState(false)
+
+  const handleTimeSpoken = useCallback(() => {
+    if (nextUncompletedTodo) {
+      setIsSpeakingReminder(true)
+      speakReminder(() => setIsSpeakingReminder(false))
+    }
+  }, [nextUncompletedTodo, speakReminder])
+
+  const {
     currentTime,
     settings,
     updateInterval,
@@ -77,7 +99,23 @@ export function App() {
     selectedVoiceId,
     selectVoice,
     isSpeaking,
-  } = useSpeakingClock()
+  } = useSpeakingClock({ onTimeSpoken: handleTimeSpoken })
+
+  // Sync voice selection between clock and reminder
+  const handleVoiceChange = useCallback(
+    (voiceId: string) => {
+      selectVoice(voiceId)
+      setTodoVoice(voiceId)
+    },
+    [selectVoice, setTodoVoice]
+  )
+
+  // Sync todo voice when clock voice is initially set
+  useEffect(() => {
+    if (selectedVoiceId) {
+      setTodoVoice(selectedVoiceId)
+    }
+  }, [selectedVoiceId, setTodoVoice])
 
   const {
     isSupported: wakeLockSupported,
@@ -336,7 +374,7 @@ export function App() {
             {/* Voice Selection */}
             <div className="space-y-2">
               <span className="text-sm font-medium">語音選擇</span>
-              <Select value={selectedVoiceId || ''} onValueChange={selectVoice} aria-label="選擇語音" disabled={voicesLoading}>
+              <Select value={selectedVoiceId || ''} onValueChange={handleVoiceChange} aria-label="選擇語音" disabled={voicesLoading}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={voicesLoading ? "載入語音中..." : "選擇語音"} />
                 </SelectTrigger>
@@ -360,6 +398,28 @@ export function App() {
             <Button onClick={speakNow} className="w-full" size="lg" aria-label="立即報時">
               立即報時
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Todo Section */}
+        <Card className={isSpeakingReminder ? 'ring-2 ring-primary animate-pulse' : ''}>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-2">
+              <ListTodo className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">待辦提醒</h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              報時後會語音提醒下一個待辦事項
+            </p>
+            <TodoForm onAdd={addTodo} />
+            <TodoList
+              todos={todos}
+              nextTodoId={nextUncompletedTodo?.id ?? null}
+              onToggle={toggleTodo}
+              onUpdate={updateTodo}
+              onRemove={removeTodo}
+              onReorder={reorderTodos}
+            />
           </CardContent>
         </Card>
 
