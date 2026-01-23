@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/koshuang/speaking-clock/compare/v1.2.0...v1.3.0) (2026-01-23)
+
+
+### Features
+
+* **todo:** add icon picker for todo items ([c8e53dc](https://github.com/koshuang/speaking-clock/commit/c8e53dce32aaa7ce29538f4fbe3ab878ec635170)), closes [#24](https://github.com/koshuang/speaking-clock/issues/24)
+
 ## [1.2.0](https://github.com/koshuang/speaking-clock/compare/v1.1.1...v1.2.0) (2026-01-23)
 
 
