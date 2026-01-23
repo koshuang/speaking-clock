@@ -1,6 +1,7 @@
 export interface Todo {
   id: string
   text: string
+  icon?: string
   completed: boolean
   order: number
   createdAt: number

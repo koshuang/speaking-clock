@@ -8,18 +8,18 @@ export function useTodos() {
   const [todoList, setTodoList] = useState<TodoList>(() => manageTodosUseCase.load())
 
   const addTodo = useCallback(
-    (text: string) => {
+    (text: string, icon?: string) => {
       if (!text.trim()) return
-      const updated = manageTodosUseCase.add(todoList, text)
+      const updated = manageTodosUseCase.add(todoList, text, icon)
       setTodoList(updated)
     },
     [manageTodosUseCase, todoList]
   )
 
   const updateTodo = useCallback(
-    (id: string, text: string) => {
+    (id: string, text: string, icon?: string) => {
       if (!text.trim()) return
-      const updated = manageTodosUseCase.update(todoList, id, text)
+      const updated = manageTodosUseCase.update(todoList, id, text, icon)
       setTodoList(updated)
     },
     [manageTodosUseCase, todoList]

@@ -18,6 +18,7 @@
 ### v1.2.0 新增功能
 - **待辦提醒** - 報時後語音提醒待辦事項（「提醒您：[待辦內容]」）
 - **待辦管理** - 完整的新增、編輯、刪除功能
+- **待辦圖示** - 可選擇 60+ 種圖示，方便小朋友辨識（13 類：上學、學習、美術、音樂等）
 - **拖曳排序** - 拖曳調整待辦順序，決定提醒優先級
 - **完成標記** - 點擊打勾標記完成，自動切換到下一個待辦
 
@@ -109,11 +110,12 @@ Domain 層 Use Case 已有完整單元測試：
   - updateInterval() 更新間隔
   - toggleEnabled() 切換啟用狀態
 
-✓ ManageTodosUseCase.test.ts (16 tests)
+✓ ManageTodosUseCase.test.ts (20 tests)
   - add() / update() / remove() 待辦 CRUD
   - toggle() 切換完成狀態
   - reorder() 重新排序
   - getNextUncompleted() 取得下一個待辦
+  - icon 圖示新增與更新
 
 ✓ SpeakReminderUseCase.test.ts (5 tests)
   - execute() 播報提醒
@@ -128,6 +130,7 @@ Domain 層 Use Case 已有完整單元測試：
 | 建置工具 | Vite 7 |
 | 語言 | TypeScript |
 | UI 元件庫 | shadcn/ui |
+| 圖示庫 | lucide-react |
 | 拖曳排序 | dnd-kit |
 | 樣式 | Tailwind CSS v4 |
 | PWA | vite-plugin-pwa |

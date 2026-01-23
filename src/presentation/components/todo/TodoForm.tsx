@@ -2,24 +2,28 @@ import { useState } from 'react'
 import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'
 import { Plus } from 'lucide-react'
+import { IconPicker } from './IconPicker'
 
 interface TodoFormProps {
-  onAdd: (text: string) => void
+  onAdd: (text: string, icon?: string) => void
 }
 
 export function TodoForm({ onAdd }: TodoFormProps) {
   const [text, setText] = useState('')
+  const [icon, setIcon] = useState<string | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (text.trim()) {
-      onAdd(text.trim())
+      onAdd(text.trim(), icon)
       setText('')
+      setIcon(undefined)
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
+      <IconPicker value={icon} onChange={setIcon} />
       <Input
         type="text"
         value={text}

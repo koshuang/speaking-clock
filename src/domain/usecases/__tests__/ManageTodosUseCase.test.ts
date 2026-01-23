@@ -68,6 +68,30 @@ describe('ManageTodosUseCase', () => {
 
       expect(result.items[0].text).toBe('新待辦事項')
     })
+
+    it('應該支援新增帶圖示的待辦事項', () => {
+      vi.spyOn(crypto, 'randomUUID').mockReturnValue('new-id-00-00-00-00' as `${string}-${string}-${string}-${string}-${string}`)
+      vi.spyOn(Date, 'now').mockReturnValue(5000)
+
+      const result = useCase.add({ items: [] }, '寫功課', 'BookOpen')
+
+      expect(result.items[0]).toEqual({
+        id: 'new-id-00-00-00-00',
+        text: '寫功課',
+        icon: 'BookOpen',
+        completed: false,
+        order: 0,
+        createdAt: 5000,
+      })
+    })
+
+    it('新增時不傳圖示應該為 undefined', () => {
+      vi.spyOn(crypto, 'randomUUID').mockReturnValue('new-id-00-00-00-00' as `${string}-${string}-${string}-${string}-${string}`)
+
+      const result = useCase.add({ items: [] }, '待辦事項')
+
+      expect(result.items[0].icon).toBeUndefined()
+    })
   })
 
   describe('update', () => {
@@ -84,6 +108,27 @@ describe('ManageTodosUseCase', () => {
 
       const updatedItem = result.items.find((item) => item.id === '1')
       expect(updatedItem?.text).toBe('更新後')
+    })
+
+    it('應該支援更新待辦事項的圖示', () => {
+      const result = useCase.update(mockTodoList, '1', '寫功課', 'BookOpen')
+
+      const updatedItem = result.items.find((item) => item.id === '1')
+      expect(updatedItem?.text).toBe('寫功課')
+      expect(updatedItem?.icon).toBe('BookOpen')
+    })
+
+    it('應該支援移除待辦事項的圖示', () => {
+      const listWithIcon = {
+        items: [
+          { id: '1', text: '待辦事項', icon: 'BookOpen', completed: false, order: 0, createdAt: 1000 },
+        ],
+      }
+
+      const result = useCase.update(listWithIcon, '1', '待辦事項', undefined)
+
+      const updatedItem = result.items.find((item) => item.id === '1')
+      expect(updatedItem?.icon).toBeUndefined()
     })
   })
 

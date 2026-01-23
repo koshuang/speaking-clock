@@ -6,18 +6,21 @@ import { Checkbox } from '@/presentation/components/ui/checkbox'
 import { Input } from '@/presentation/components/ui/input'
 import { GripVertical, Pencil, Trash2, Check, X } from 'lucide-react'
 import type { Todo } from '@/domain/entities/Todo'
+import { TodoIcon } from './TodoIcon'
+import { IconPicker } from './IconPicker'
 
 interface TodoItemProps {
   todo: Todo
   isNext: boolean
   onToggle: (id: string) => void
-  onUpdate: (id: string, text: string) => void
+  onUpdate: (id: string, text: string, icon?: string) => void
   onRemove: (id: string) => void
 }
 
 export function TodoItem({ todo, isNext, onToggle, onUpdate, onRemove }: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState(todo.text)
+  const [editIcon, setEditIcon] = useState<string | undefined>(todo.icon)
 
   const {
     attributes,
@@ -36,13 +39,14 @@ export function TodoItem({ todo, isNext, onToggle, onUpdate, onRemove }: TodoIte
 
   const handleSave = () => {
     if (editText.trim()) {
-      onUpdate(todo.id, editText.trim())
+      onUpdate(todo.id, editText.trim(), editIcon)
       setIsEditing(false)
     }
   }
 
   const handleCancel = () => {
     setEditText(todo.text)
+    setEditIcon(todo.icon)
     setIsEditing(false)
   }
 
@@ -78,7 +82,8 @@ export function TodoItem({ todo, isNext, onToggle, onUpdate, onRemove }: TodoIte
       />
 
       {isEditing ? (
-        <div className="flex flex-1 gap-1">
+        <div className="flex flex-1 items-center gap-1">
+          <IconPicker value={editIcon} onChange={setEditIcon} size="sm" />
           <Input
             type="text"
             value={editText}
@@ -97,6 +102,7 @@ export function TodoItem({ todo, isNext, onToggle, onUpdate, onRemove }: TodoIte
         </div>
       ) : (
         <>
+          {todo.icon && <TodoIcon name={todo.icon} size={18} className="text-primary" />}
           <span
             className={`flex-1 text-sm ${todo.completed ? 'line-through text-muted-foreground' : ''}`}
           >
