@@ -1,37 +1,18 @@
 # 語音報時器 Speaking Clock
 
-一款可安裝的網頁應用程式（PWA），提供定時語音報時功能。
+一款可安裝的網頁應用程式（PWA），提供定時語音報時功能，適合需要時間提醒的用戶，包含為小朋友設計的待辦提醒功能。
 
 **線上體驗**: [https://koshuang.github.io/speaking-clock/](https://koshuang.github.io/speaking-clock/)
 
 ## 功能特色
 
-### 核心功能
-- **即時時鐘** - 顯示當前日期與時間，每秒更新
-- **定時報時** - 可設定 1、5、10、15、30、60 分鐘間隔自動報時
-- **語音合成** - 使用 Web Speech API 進行中文語音報時
-- **時段區分** - 凌晨、上午、下午、晚上智慧判斷
-- **螢幕常亮** - 支援 Screen Wake Lock API 防止螢幕關閉
+- **定時報時** - 1/5/10/15/30/60 分鐘間隔自動語音報時
+- **待辦提醒** - 報時後語音提醒待辦事項，支援 60+ 種圖示方便小朋友辨識
+- **深色模式** - 支援淺色/深色/系統主題
 - **PWA 支援** - 可安裝到桌面或手機，支援離線使用
-- **設定記憶** - 自動保存用戶偏好設定
+- **無障礙設計** - ARIA 標籤、鍵盤操作、螢幕閱讀器支援
 
-### v1.2.0 新增功能
-- **待辦提醒** - 報時後語音提醒待辦事項（「提醒您：[待辦內容]」）
-- **待辦管理** - 完整的新增、編輯、刪除功能
-- **待辦圖示** - 可選擇 60+ 種圖示，方便小朋友辨識（13 類：上學、學習、美術、音樂等）
-- **拖曳排序** - 拖曳調整待辦順序，決定提醒優先級
-- **完成標記** - 點擊打勾標記完成，自動切換到下一個待辦
-
-### v1.1.0 新增功能
-- **深色模式** - 支援淺色/深色/系統主題切換
-- **視覺回饋** - 報時時時鐘卡片會有脈動動畫
-- **下次報時** - 頁尾顯示下次報時時間
-- **點擊報時** - 點擊時鐘即可立即報時
-- **PWA 安裝提示** - 自動顯示安裝提示橫幅
-- **無障礙支援** - 所有控制項皆有 ARIA 標籤
-- **新手導覽** - 首次使用顯示功能介紹
-
-> 詳細產品規格請參閱 [PRD 文件](./docs/PRD.md) | [UI/UX 設計指南](./docs/UI-UX-DESIGN-GUIDE.md)
+> 版本歷史請參閱 [CHANGELOG](./CHANGELOG.md)
 
 ## 快速開始
 
@@ -63,63 +44,14 @@ npm run init-prd    # 初始化 PRD 工作檔案
 
 ## 專案架構
 
-採用 **Clean Architecture** 分層架構，確保核心業務邏輯獨立於框架與外部依賴：
+採用 **Clean Architecture** 分層架構：
 
 ```
-speaking-clock/
-├── src/
-│   ├── domain/                # 核心業務邏輯（無外部依賴）
-│   ├── infrastructure/        # 外部依賴實作
-│   ├── presentation/          # UI 層
-│   └── di/                    # 依賴注入
-├── docs/
-│   ├── PRD.md                 # 產品需求文件
-│   └── templates/             # PRD 範本（團隊共享）
-├── scripts/
-│   └── init-prd.sh            # PRD 初始化腳本
-└── .omc/                      # 本地工作目錄（gitignore）
-```
-
-### 架構優點
-
-| 層級 | 職責 | 優點 |
-|------|------|------|
-| Domain | 核心業務邏輯 | 無外部依賴，可獨立測試 |
-| Ports | 抽象介面定義 | 依賴反轉，方便替換實作 |
-| Infrastructure | 外部依賴實作 | 隔離瀏覽器 API |
-| Presentation | UI 邏輯 | 專注於畫面呈現 |
-| DI | 依賴注入 | 集中管理物件建立 |
-
-## 測試
-
-Domain 層 Use Case 已有完整單元測試：
-
-```
-✓ TimeFormatter.test.ts (15 tests)
-  - 時段判斷（凌晨、上午、下午、晚上）
-  - 小時格式化（12小時制）
-  - 分鐘格式化（整點 vs 非整點）
-
-✓ SpeakTimeUseCase.test.ts (6 tests)
-  - execute() 執行報時
-  - setVoice() 設定語音
-  - getVoices() 取得語音列表
-
-✓ ManageSettingsUseCase.test.ts (10 tests)
-  - load() / save() 設定存取
-  - updateInterval() 更新間隔
-  - toggleEnabled() 切換啟用狀態
-
-✓ ManageTodosUseCase.test.ts (20 tests)
-  - add() / update() / remove() 待辦 CRUD
-  - toggle() 切換完成狀態
-  - reorder() 重新排序
-  - getNextUncompleted() 取得下一個待辦
-  - icon 圖示新增與更新
-
-✓ SpeakReminderUseCase.test.ts (5 tests)
-  - execute() 播報提醒
-  - setVoice() 設定語音
+src/
+├── domain/           # 核心業務邏輯（無外部依賴）
+├── infrastructure/   # 外部依賴實作（瀏覽器 API）
+├── presentation/     # UI 層（React 元件）
+└── di/               # 依賴注入
 ```
 
 ## 技術棧
@@ -155,6 +87,14 @@ Domain 層 Use Case 已有完整單元測試：
 npm run build
 # 將 dist/ 目錄部署到靜態網站服務
 ```
+
+## 文件
+
+| 文件 | 說明 |
+|------|------|
+| [CHANGELOG](./CHANGELOG.md) | 版本歷史與變更記錄 |
+| [PRD](./docs/PRD.md) | 產品需求文件 |
+| [UI/UX 設計指南](./docs/UI-UX-DESIGN-GUIDE.md) | 設計規範與元件指南 |
 
 ## 授權
 

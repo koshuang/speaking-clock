@@ -1,66 +1,57 @@
 # Changelog
 
-## [1.3.0](https://github.com/koshuang/speaking-clock/compare/v1.2.0...v1.3.0) (2026-01-23)
+所有重要變更都會記錄在此文件中。
 
+格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
+版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
-### Features
+## [Unreleased]
 
-* **todo:** add icon picker for todo items ([c8e53dc](https://github.com/koshuang/speaking-clock/commit/c8e53dce32aaa7ce29538f4fbe3ab878ec635170)), closes [#24](https://github.com/koshuang/speaking-clock/issues/24)
+## [1.3.0] - 2024-XX-XX
 
-## [1.2.0](https://github.com/koshuang/speaking-clock/compare/v1.1.1...v1.2.0) (2026-01-23)
+### Added
+- 待辦項目圖示選擇功能（60+ 圖示、13 類別）
+- 圖示分類：上學、學習、美術、科學、音樂、運動、生活、飲食、玩樂、寵物、戶外、清潔、其他
+- UI/UX 設計指南文件
 
+### Fixed
+- 修復編輯待辦時圖示無法保存的問題
+- 修復有/無圖示的待辦項目文字對齊問題
+- 改善圖示選擇器在小螢幕的顯示（水平滾動）
+- 新增圖示按鈕 tooltip 提示
 
-### Features
+## [1.2.0] - 2024-XX-XX
 
-* add todo reminder feature ([0634233](https://github.com/koshuang/speaking-clock/commit/0634233bbab178cb3d22d8f3e52ad11519c7bf49))
+### Added
+- **待辦提醒功能** - 報時後語音提醒待辦事項
+- 待辦事項 CRUD（新增、編輯、刪除）
+- 拖曳排序調整優先級
+- 完成標記與自動切換
+- 視覺提示高亮下一個待辦
 
-## [1.1.1](https://github.com/koshuang/speaking-clock/compare/v1.1.0...v1.1.1) (2026-01-22)
+## [1.1.1] - 2024-XX-XX
 
+### Fixed
+- 修復語音下拉選單在滾動時跳動的問題
 
-### Bug Fixes
+## [1.1.0] - 2024-XX-XX
 
-* **ui:** prevent voice dropdown from jumping during scroll ([dd2929c](https://github.com/koshuang/speaking-clock/commit/dd2929c9605502c87c2b6f2f61b8b2068cd79dcf))
-* **ui:** use popper position for voice dropdown ([#20](https://github.com/koshuang/speaking-clock/issues/20)) ([57b2374](https://github.com/koshuang/speaking-clock/commit/57b2374ca990247f6e145fa983a162ae8278cb93))
+### Added
+- **深色模式** - 支援淺色/深色/系統主題切換
+- 報時時時鐘卡片脈動動畫
+- 頁尾顯示下次報時時間
+- 點擊時鐘觸發報時
+- PWA 安裝提示橫幅
+- 無障礙支援（ARIA 標籤、鍵盤操作）
+- 首次使用新手導覽
 
+## [1.0.0] - 2024-XX-XX
 
-### Documentation
-
-* add PRD templates for Ralph workflow ([9b4399e](https://github.com/koshuang/speaking-clock/commit/9b4399eb57a88a2b8f775dbf4342d8cea540bdf7))
-* update CHANGELOG.md with detailed v1.1.0 notes ([1b01de5](https://github.com/koshuang/speaking-clock/commit/1b01de5c6f5c3d787511561ce7f2a08fca11d453))
-* update documentation for v1.1.0 features ([dfe6b6b](https://github.com/koshuang/speaking-clock/commit/dfe6b6bf5d9fe0cda278c86e331606465296c06a))
-
-## [1.1.0](https://github.com/koshuang/speaking-clock/compare/v1.0.0...v1.1.0) (2026-01-22)
-
-
-### Bug Fixes
-
-* **timer**: align with system clock for precise announcements ([#2](https://github.com/koshuang/speaking-clock/issues/2))
-* **voices**: use addEventListener with proper cleanup for voiceschanged event ([#3](https://github.com/koshuang/speaking-clock/issues/3))
-* **useEffect**: split voice loading and restoration into separate hooks ([#4](https://github.com/koshuang/speaking-clock/issues/4))
-* **wakeLock**: track user intent with wantActiveRef for proper state sync ([#5](https://github.com/koshuang/speaking-clock/issues/5))
-
-
-### Features
-
-* **ui**: add visual feedback (pulse animation) during announcement ([#6](https://github.com/koshuang/speaking-clock/issues/6))
-* **ui**: display next announcement time in footer ([#7](https://github.com/koshuang/speaking-clock/issues/7))
-* **ui**: add voice loading state indicator ([#8](https://github.com/koshuang/speaking-clock/issues/8))
-* **ui**: add dark mode toggle with light/dark/system options ([#9](https://github.com/koshuang/speaking-clock/issues/9))
-* **ui**: improve voice name display with friendly region labels ([#10](https://github.com/koshuang/speaking-clock/issues/10))
-* **pwa**: add install prompt banner ([#11](https://github.com/koshuang/speaking-clock/issues/11))
-* **a11y**: add aria labels to all interactive controls ([#12](https://github.com/koshuang/speaking-clock/issues/12))
-* **ui**: make clock clickable to trigger announcement ([#13](https://github.com/koshuang/speaking-clock/issues/13))
-* **ui**: add checkmark to selected interval ([#14](https://github.com/koshuang/speaking-clock/issues/14))
-* **ui**: add onboarding guide for new users ([#15](https://github.com/koshuang/speaking-clock/issues/15))
-
-## 1.0.0 (2026-01-22)
-
-
-### Features
-
-* Integrate shadcn/ui and Tailwind CSS v4 ([143ed2c](https://github.com/koshuang/speaking-clock/commit/143ed2c6ae5c532705da8cf6aab49598a96ed956))
-
-
-### Bug Fixes
-
-* Persist voice selection to localStorage ([c714c2f](https://github.com/koshuang/speaking-clock/commit/c714c2fa701553a7ff80f06c58bd39ef17d2ea25))
+### Added
+- 即時時鐘顯示（每秒更新）
+- 定時語音報時（1/5/10/15/30/60 分鐘間隔）
+- Web Speech API 中文語音合成
+- 時段智慧判斷（凌晨/上午/下午/晚上）
+- Screen Wake Lock 螢幕常亮
+- PWA 支援（可安裝、離線使用）
+- 設定自動保存（localStorage）
