@@ -8,6 +8,7 @@
 
 - **定時報時** - 1/5/10/15/30/60 分鐘間隔自動語音報時
 - **待辦提醒** - 報時後語音提醒待辦事項，支援 60+ 種圖示方便小朋友辨識
+- **任務計時** - 為待辦設定時長（5-60分鐘），自動計時並語音提醒剩餘時間
 - **深色模式** - 支援淺色/深色/系統主題
 - **PWA 支援** - 可安裝到桌面或手機，支援離線使用
 - **無障礙設計** - ARIA 標籤、鍵盤操作、螢幕閱讀器支援
@@ -75,7 +76,8 @@ src/
 |-----|------|
 | [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API) | 語音合成 |
 | [Screen Wake Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API) | 防止螢幕關閉 |
-| [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) | 儲存設定 |
+| [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) | 儲存設定與待辦 |
+| [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) | 儲存進行中任務狀態 |
 
 ## 部署
 

@@ -47,7 +47,7 @@ speaking-clock/
 ├── src/
 │   ├── domain/                # 核心業務邏輯（純 TypeScript，無外部依賴）
 │   │   ├── entities/          # 資料模型（設定、語音、待辦）
-│   │   ├── usecases/          # 應用邏輯（報時、設定管理、待辦管理、語音提醒）
+│   │   ├── usecases/          # 應用邏輯（報時、設定管理、待辦管理、語音提醒、任務計時）
 │   │   └── ports/             # 介面定義（語音合成、儲存庫、螢幕鎖定）
 │   ├── infrastructure/        # 外部依賴實作（Web Speech API、localStorage）
 │   ├── presentation/          # UI 層 (React)
