@@ -34,6 +34,7 @@ export function DurationPicker({
   };
 
   const isSmall = size === 'sm' || compact;
+  const hideValue = compact && !value;
 
   return (
     <Select
@@ -42,22 +43,23 @@ export function DurationPicker({
     >
       <SelectTrigger
         className={cn(
-          'gap-1 shrink-0',
-          isSmall ? 'h-8 text-xs' : '',
+          'shrink-0',
+          isSmall ? 'h-9 text-xs' : '',
           compact
             ? value
-              ? 'w-16 px-2'
-              : 'w-9 px-0 justify-center'
+              ? 'w-[4.5rem] gap-1 px-2'
+              : 'w-10 gap-0 px-2 [&>svg:last-child]:hidden'
             : size === 'sm'
-              ? 'w-20 px-2'
-              : 'w-28',
+              ? 'w-20 gap-1 px-2'
+              : 'w-28 gap-2',
           className
         )}
+        aria-label="選擇任務時長"
       >
-        <Clock className={cn('shrink-0', isSmall ? 'h-3.5 w-3.5' : 'h-4 w-4')} />
-        {(!compact || value) && (
+        <Clock className="h-4 w-4 shrink-0" />
+        <span className={hideValue ? 'sr-only' : ''}>
           <SelectValue placeholder={compact ? '' : '不計時'} />
-        )}
+        </span>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="none">不計時</SelectItem>
