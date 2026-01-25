@@ -5,6 +5,7 @@ import {
   SpeakReminderUseCase,
   TaskDurationUseCase,
   TaskReminderTextGenerator,
+  AnnouncementScheduler,
 } from '../domain/usecases'
 import {
   WebSpeechSynthesizer,
@@ -28,6 +29,7 @@ const manageTodosUseCase = new ManageTodosUseCase(todoRepository)
 const speakReminderUseCase = new SpeakReminderUseCase(speechSynthesizer)
 const taskDurationUseCase = new TaskDurationUseCase()
 const taskReminderTextGenerator = new TaskReminderTextGenerator()
+const announcementScheduler = new AnnouncementScheduler()
 
 export const container = {
   speechSynthesizer,
@@ -41,4 +43,5 @@ export const container = {
   speakReminderUseCase,
   taskDurationUseCase,
   taskReminderTextGenerator,
+  announcementScheduler,
 }
