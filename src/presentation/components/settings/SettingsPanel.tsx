@@ -49,6 +49,7 @@ interface SettingsPanelProps {
   onToggleWakeLock: () => void
   onSpeakNow: () => void
   onToggleChildMode: () => void
+  onUpdateChildName: (name: string) => void
 }
 
 export function SettingsPanel({
@@ -64,6 +65,7 @@ export function SettingsPanel({
   onToggleWakeLock,
   onSpeakNow,
   onToggleChildMode,
+  onUpdateChildName,
 }: SettingsPanelProps) {
   const [isCustomInterval, setIsCustomInterval] = useState(false)
   const [customIntervalValue, setCustomIntervalValue] = useState('')
@@ -165,6 +167,24 @@ export function SettingsPanel({
           開啟後顯示大按鈕、慢速語音，適合小朋友使用
         </p>
       </div>
+
+      {/* Child Name Input - Only shown in child mode */}
+      {settings.childMode && (
+        <div className="space-y-2">
+          <span className="text-sm font-medium">主人公名字</span>
+          <Input
+            type="text"
+            placeholder="例如：小安"
+            value={settings.childName || ''}
+            onChange={(e) => onUpdateChildName(e.target.value)}
+            className="w-full"
+            aria-label="輸入小朋友的名字"
+          />
+          <p className="text-xs text-muted-foreground">
+            提醒時會先念名字再唸任務，例如「小安，該寫功課囉」
+          </p>
+        </div>
+      )}
 
       {/* Interval Selection */}
       <div className="space-y-2">

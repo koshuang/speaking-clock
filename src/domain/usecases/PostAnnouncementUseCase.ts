@@ -6,6 +6,7 @@ export interface PostAnnouncementContext {
   activeTaskState: ActiveTaskState | null
   remainingSeconds: number
   nextUncompletedTodo: Todo | null
+  childName?: string
 }
 
 export interface PostAnnouncementResult {
@@ -32,7 +33,8 @@ export class PostAnnouncementUseCase {
    * @returns Result indicating what to announce
    */
   getNextAnnouncement(context: PostAnnouncementContext): PostAnnouncementResult {
-    const { activeTodo, activeTaskState, remainingSeconds, nextUncompletedTodo } = context
+    const { activeTodo, activeTaskState, remainingSeconds, nextUncompletedTodo, childName } = context
+    const namePrefix = childName ? `${childName}，` : ''
 
     // Priority 1: Active task that is running (not paused)
     if (
@@ -43,13 +45,13 @@ export class PostAnnouncementUseCase {
       remainingSeconds > 0
     ) {
       const remainingMinutes = Math.ceil(remainingSeconds / 60)
-      const message = this.textGenerator.generateProgressText(
+      const baseMessage = this.textGenerator.generateProgressText(
         activeTodo.text,
         remainingMinutes
       )
       return {
         type: 'active_task',
-        message,
+        message: `${namePrefix}${baseMessage}`,
         todo: activeTodo,
       }
     }
@@ -57,10 +59,10 @@ export class PostAnnouncementUseCase {
     // Priority 2: Next uncompleted todo
     if (nextUncompletedTodo) {
       // Use the speak reminder format for next todo
-      const message = this.generateNextTodoMessage(nextUncompletedTodo)
+      const baseMessage = this.generateNextTodoMessage(nextUncompletedTodo)
       return {
         type: 'next_todo',
-        message,
+        message: `${namePrefix}${baseMessage}`,
         todo: nextUncompletedTodo,
       }
     }

@@ -34,6 +34,7 @@ describe('SpeakReminderUseCase', () => {
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         '提醒您：買牛奶',
         undefined,
+        undefined,
         undefined
       )
     })
@@ -53,7 +54,8 @@ describe('SpeakReminderUseCase', () => {
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         '提醒您：測試待辦',
         undefined,
-        onEnd
+        onEnd,
+        undefined
       )
     })
 
@@ -72,6 +74,7 @@ describe('SpeakReminderUseCase', () => {
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         '提醒您：待辦事項',
         'voice1',
+        undefined,
         undefined
       )
     })
@@ -93,6 +96,7 @@ describe('SpeakReminderUseCase', () => {
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         expect.any(String),
         'voice2',
+        undefined,
         undefined
       )
     })
@@ -113,7 +117,67 @@ describe('SpeakReminderUseCase', () => {
       expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
         expect.any(String),
         'voice2',
+        undefined,
         undefined
+      )
+    })
+  })
+
+  describe('childName option', () => {
+    it('應該在有 childName 時先念名字', () => {
+      const todo: Todo = {
+        id: '1',
+        text: '寫功課',
+        completed: false,
+        order: 0,
+        createdAt: 1000,
+      }
+
+      useCase.execute(todo, undefined, { childName: '小安' })
+
+      expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
+        '小安，提醒您：寫功課',
+        undefined,
+        undefined,
+        undefined
+      )
+    })
+
+    it('沒有 childName 時不應有前綴', () => {
+      const todo: Todo = {
+        id: '1',
+        text: '寫功課',
+        completed: false,
+        order: 0,
+        createdAt: 1000,
+      }
+
+      useCase.execute(todo, undefined, {})
+
+      expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
+        '提醒您：寫功課',
+        undefined,
+        undefined,
+        undefined
+      )
+    })
+
+    it('應該傳遞 rate 參數', () => {
+      const todo: Todo = {
+        id: '1',
+        text: '寫功課',
+        completed: false,
+        order: 0,
+        createdAt: 1000,
+      }
+
+      useCase.execute(todo, undefined, { childName: '小安', rate: 0.7 })
+
+      expect(mockSpeechSynthesizer.speak).toHaveBeenCalledWith(
+        '小安，提醒您：寫功課',
+        undefined,
+        undefined,
+        0.7
       )
     })
   })

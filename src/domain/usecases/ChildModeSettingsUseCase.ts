@@ -5,7 +5,7 @@ export interface ChildModeConfig {
 
 export class ChildModeSettingsUseCase {
   private readonly DEFAULT_SPEECH_RATE = 1.0
-  private readonly CHILD_MODE_SPEECH_RATE = 0.7
+  private readonly CHILD_MODE_SPEECH_RATE = 0.8
 
   getConfig(childModeEnabled: boolean): ChildModeConfig {
     return childModeEnabled

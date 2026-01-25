@@ -160,12 +160,22 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
     setSettings(newSettings)
   }, [manageSettingsUseCase, settings])
 
+  const updateChildName = useCallback(
+    (name: string) => {
+      const newSettings = { ...settings, childName: name || undefined }
+      manageSettingsUseCase.save(newSettings)
+      setSettings(newSettings)
+    },
+    [manageSettingsUseCase, settings]
+  )
+
   return {
     currentTime,
     settings,
     updateInterval,
     toggleEnabled,
     toggleChildMode,
+    updateChildName,
     speakNow,
     voices,
     voicesLoading,

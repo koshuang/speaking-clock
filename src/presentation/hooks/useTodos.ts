@@ -57,10 +57,10 @@ export function useTodos() {
   )
 
   const speakReminder = useCallback(
-    (onEnd?: () => void) => {
+    (onEnd?: () => void, options?: { childName?: string; rate?: number }) => {
       const nextTodo = manageTodosUseCase.getNextUncompleted(todoList)
       if (nextTodo) {
-        speakReminderUseCase.execute(nextTodo, onEnd)
+        speakReminderUseCase.execute(nextTodo, onEnd, options)
       } else {
         onEnd?.()
       }

@@ -59,12 +59,15 @@ export function App() {
     remainingSeconds: number
     isPaused: boolean
     selectedVoiceId: string | null
-  }>({ activeTodo: null, remainingSeconds: 0, isPaused: false, selectedVoiceId: null })
+    childName?: string
+    childMode: boolean
+  }>({ activeTodo: null, remainingSeconds: 0, isPaused: false, selectedVoiceId: null, childMode: false })
 
   const [isSpeakingReminder, setIsSpeakingReminder] = useState(false)
 
   const handleTimeSpoken = useCallback(() => {
-    const { activeTodo, remainingSeconds, isPaused, selectedVoiceId } = activeTaskDataRef.current
+    const { activeTodo, remainingSeconds, isPaused, selectedVoiceId, childName, childMode } = activeTaskDataRef.current
+    const rate = childMode ? container.childModeSettingsUseCase.getChildModeSpeechRate() : undefined
     const announcement = container.postAnnouncementUseCase.getNextAnnouncement({
       activeTodo,
       activeTaskState: activeTodo && !isPaused
@@ -74,16 +77,17 @@ export function App() {
           : null,
       remainingSeconds,
       nextUncompletedTodo,
+      childName,
     })
 
     if (announcement.type === 'active_task' && announcement.message) {
       setIsSpeakingReminder(true)
       container.speechSynthesizer.speak(announcement.message, selectedVoiceId ?? undefined, () => {
         setIsSpeakingReminder(false)
-      })
+      }, rate)
     } else if (announcement.type === 'next_todo') {
       setIsSpeakingReminder(true)
-      speakReminder(() => setIsSpeakingReminder(false))
+      speakReminder(() => setIsSpeakingReminder(false), { childName, rate })
     }
   }, [nextUncompletedTodo, speakReminder])
 
@@ -93,6 +97,7 @@ export function App() {
     updateInterval,
     toggleEnabled,
     toggleChildMode,
+    updateChildName,
     speakNow,
     voices,
     voicesLoading,
@@ -114,8 +119,15 @@ export function App() {
 
   // Keep ref in sync with current values
   useEffect(() => {
-    activeTaskDataRef.current = { activeTodo, remainingSeconds, isPaused, selectedVoiceId }
-  }, [activeTodo, remainingSeconds, isPaused, selectedVoiceId])
+    activeTaskDataRef.current = {
+      activeTodo,
+      remainingSeconds,
+      isPaused,
+      selectedVoiceId,
+      childName: settings.childName,
+      childMode: settings.childMode,
+    }
+  }, [activeTodo, remainingSeconds, isPaused, selectedVoiceId, settings.childName, settings.childMode])
 
   // Sync voice selection between clock and reminder
   const handleVoiceChange = useCallback(
@@ -474,6 +486,7 @@ export function App() {
                   onToggleWakeLock={toggleWakeLock}
                   onSpeakNow={speakNow}
                   onToggleChildMode={toggleChildMode}
+                  onUpdateChildName={updateChildName}
                 />
               </CardContent>
             </Card>

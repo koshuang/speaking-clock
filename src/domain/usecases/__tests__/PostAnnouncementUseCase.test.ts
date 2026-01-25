@@ -167,4 +167,65 @@ describe('PostAnnouncementUseCase', () => {
       expect(result).toBe(false)
     })
   })
+
+  describe('childName support', () => {
+    it('should prepend childName to active task message', () => {
+      const activeTodo = createTodo({ text: '寫功課', durationMinutes: 30 })
+      const result = useCase.getNextAnnouncement({
+        activeTodo,
+        activeTaskState: createActiveTaskState(),
+        remainingSeconds: 900,
+        nextUncompletedTodo: null,
+        childName: '小安',
+      })
+
+      expect(result.type).toBe('active_task')
+      expect(result.message).toMatch(/^小安，/)
+      expect(result.message).toContain('寫功課')
+    })
+
+    it('should prepend childName to next todo message', () => {
+      const nextTodo = createTodo({ text: '練鋼琴' })
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: nextTodo,
+        childName: '小明',
+      })
+
+      expect(result.type).toBe('next_todo')
+      expect(result.message).toMatch(/^小明，/)
+      expect(result.message).toContain('練鋼琴')
+    })
+
+    it('should not add prefix when childName is undefined', () => {
+      const nextTodo = createTodo({ text: '練鋼琴' })
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: nextTodo,
+        childName: undefined,
+      })
+
+      expect(result.type).toBe('next_todo')
+      expect(result.message).not.toMatch(/^.*，/)
+      expect(result.message).toMatch(/^接下來是/)
+    })
+
+    it('should not add prefix when childName is empty string', () => {
+      const nextTodo = createTodo({ text: '練鋼琴' })
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: nextTodo,
+        childName: '',
+      })
+
+      expect(result.type).toBe('next_todo')
+      expect(result.message).toMatch(/^接下來是/)
+    })
+  })
 })
