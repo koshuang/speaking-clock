@@ -311,15 +311,15 @@ export function App() {
             }}
             aria-label="點擊報時"
           >
-            <CardContent className="py-6 text-center">
-              <div className="text-sm opacity-90">{formatDisplayDate(currentTime)}</div>
-              <div className="mt-2 font-mono text-4xl font-bold tracking-wider">
+            <CardContent className="py-4 text-center">
+              <div className="text-xs opacity-90">{formatDisplayDate(currentTime)}</div>
+              <div className="mt-1 font-mono text-3xl font-bold tracking-wider">
                 {formatDisplayTime(currentTime)}
               </div>
-              <div className="mt-2 text-xs opacity-70">
+              <div className="mt-1 text-xs opacity-70">
                 {settings.enabled
                   ? `下次報時：${getNextAnnouncementTime(currentTime, settings.interval)}`
-                  : '報時已停用'}
+                  : '點擊可報時'}
               </div>
             </CardContent>
           </Card>
