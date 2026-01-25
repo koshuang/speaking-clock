@@ -5,6 +5,19 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.6.0](https://github.com/koshuang/speaking-clock/compare/v1.5.0...v1.6.0) (2026-01-25)
+
+
+### Features
+
+* **ui:** show active task on clock homepage ([840d722](https://github.com/koshuang/speaking-clock/commit/840d7228c1aef8fc8d239dee7231fdc3e2f537a0))
+* **ui:** show next todo on clock homepage even before starting ([8110f45](https://github.com/koshuang/speaking-clock/commit/8110f458767ce374a59b277e7723cbf236777168))
+
+
+### Bug Fixes
+
+* **task:** mark todo completed when manually completing task ([bb25c16](https://github.com/koshuang/speaking-clock/commit/bb25c169cc83e9595ceb90e763ac9d38ea78788e))
+
 ## [1.5.0](https://github.com/koshuang/speaking-clock/compare/v1.4.0...v1.5.0) (2026-01-25)
 
 
