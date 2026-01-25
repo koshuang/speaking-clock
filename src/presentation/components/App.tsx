@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSpeakingClock, useWakeLock, useTodos, useActiveTask } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
+import { Toggle } from '@/presentation/components/ui/toggle'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/presentation/components/ui/dropdown-menu'
-import { Moon, Sun, Monitor, Download } from 'lucide-react'
+import { Moon, Sun, Monitor, Download, Volume2, VolumeX } from 'lucide-react'
 import { TodoForm, TodoList } from './todo'
 import { SettingsPanel } from './settings'
 import { BottomNav, type TabId } from './layout'
@@ -326,10 +327,28 @@ export function App() {
           {/* Tab Content */}
           {activeTab === 'clock' && (
             <Card>
-              <CardContent className="py-4 text-center text-muted-foreground">
-                <p className="text-sm">點擊上方時鐘可立即報時</p>
-                <p className="mt-2 text-xs">
-                  切換到「待辦」新增提醒事項，或到「設定」調整報時間隔
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {settings.enabled ? (
+                      <Volume2 className="h-5 w-5 text-primary" />
+                    ) : (
+                      <VolumeX className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <span className="font-medium">自動報時</span>
+                  </div>
+                  <Toggle
+                    pressed={settings.enabled}
+                    onPressedChange={toggleEnabled}
+                    variant="outline"
+                    aria-label={settings.enabled ? '停用報時' : '啟用報時'}
+                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                  >
+                    {settings.enabled ? '已啟用' : '已停用'}
+                  </Toggle>
+                </div>
+                <p className="text-xs text-muted-foreground text-center">
+                  點擊時鐘可立即報時 · 到「設定」調整間隔和語音
                 </p>
               </CardContent>
             </Card>
