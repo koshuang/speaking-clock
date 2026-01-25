@@ -101,6 +101,7 @@ npm run build
 | [CHANGELOG](./CHANGELOG.md) | 版本歷史與變更記錄 |
 | [PRD](./docs/PRD.md) | 產品需求文件 |
 | [UI/UX 設計指南](./docs/UI-UX-DESIGN-GUIDE.md) | 設計規範與元件指南 |
+| [Persona 文件](./docs/personas/) | 目標用戶角色描述 |
 
 ## 授權
 
