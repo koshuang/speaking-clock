@@ -123,6 +123,14 @@ export function App() {
     }
   }, [selectedVoiceId, setTodoVoice])
 
+  // Manual complete: finish timer AND mark todo as completed
+  const handleManualComplete = useCallback(() => {
+    if (activeTodo) {
+      toggleTodo(activeTodo.id)
+    }
+    completeTask()
+  }, [activeTodo, toggleTodo, completeTask])
+
   const {
     isSupported: wakeLockSupported,
     isActive: wakeLockActive,
@@ -370,7 +378,7 @@ export function App() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={completeTask}
+                          onClick={handleManualComplete}
                           className="h-7 w-7 text-primary"
                         >
                           <Check className="h-3.5 w-3.5" />
@@ -474,7 +482,7 @@ export function App() {
                   onStartTask={startTask}
                   onPauseTask={pauseTask}
                   onResumeTask={resumeTask}
-                  onCompleteTask={completeTask}
+                  onCompleteTask={handleManualComplete}
                 />
               </CardContent>
             </Card>
