@@ -5,6 +5,27 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.4.0](https://github.com/koshuang/speaking-clock/compare/v1.3.0...v1.4.0) (2026-01-25)
+
+
+### Features
+
+* **todo:** add task timer with voice announcements ([d001587](https://github.com/koshuang/speaking-clock/commit/d001587d54c75735dcce01c7359044bf99961e34)), closes [#28](https://github.com/koshuang/speaking-clock/issues/28)
+
+
+### Bug Fixes
+
+* **todo:** pass icon parameter in TodoList onUpdate prop ([8825eb1](https://github.com/koshuang/speaking-clock/commit/8825eb1983a3d1be8b2069006c3e08b39c337cdf)), closes [#26](https://github.com/koshuang/speaking-clock/issues/26)
+* **ui:** add icon placeholder for consistent text alignment ([7727db4](https://github.com/koshuang/speaking-clock/commit/7727db4db20c71367a8b6dfd1d52158167a66d40))
+* **ui:** improve IconPicker UX with scroll and tooltip ([fc4f154](https://github.com/koshuang/speaking-clock/commit/fc4f154cc5bbe88840334ac2798412fd85e27b9a))
+
+
+### Documentation
+
+* add task timer feature documentation ([2ea40a8](https://github.com/koshuang/speaking-clock/commit/2ea40a83cafacf3f631c244b14f823e253879b60))
+* add UI/UX design guide ([8639701](https://github.com/koshuang/speaking-clock/commit/863970148fc3f4aeaa9fb50e56d807007431ef9f))
+* refactor README and add CHANGELOG ([c731fc9](https://github.com/koshuang/speaking-clock/commit/c731fc9f2fa6b89a6df12e11b1d9409505812d65))
+
 ## [Unreleased]
 
 ## [1.3.0] - 2024-XX-XX
