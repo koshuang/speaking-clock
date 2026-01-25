@@ -5,6 +5,19 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.7.0](https://github.com/koshuang/speaking-clock/compare/v1.6.1...v1.7.0) (2026-01-25)
+
+
+### Features
+
+* **ui:** add custom interval and duration options ([ca798ad](https://github.com/koshuang/speaking-clock/commit/ca798ad798c102309d91942209a3e1a0c82fd036))
+
+
+### Code Refactoring
+
+* **domain:** extract display formatting, voice selection, and announcement trigger ([a53c5de](https://github.com/koshuang/speaking-clock/commit/a53c5de2ee8cf3dfec915c37481fa069675a7b16))
+* **domain:** extract options and post-announcement logic to use cases ([8fccdae](https://github.com/koshuang/speaking-clock/commit/8fccdae647e7963eee8cbb688e20a485ce107d51))
+
 ## [1.6.1](https://github.com/koshuang/speaking-clock/compare/v1.6.0...v1.6.1) (2026-01-25)
 
 
