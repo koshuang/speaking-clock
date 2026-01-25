@@ -5,10 +5,19 @@ export interface Todo {
   completed: boolean
   order: number
   createdAt: number
+  durationMinutes?: number
 }
 
 export interface TodoList {
   items: Todo[]
+}
+
+export interface ActiveTaskState {
+  todoId: string
+  status: 'active' | 'paused'
+  startedAt: number
+  accumulatedTime: number
+  lastAnnouncedCheckpoint?: string
 }
 
 export const DEFAULT_TODO_LIST: TodoList = {

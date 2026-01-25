@@ -3,21 +3,24 @@ import { Button } from '@/presentation/components/ui/button'
 import { Input } from '@/presentation/components/ui/input'
 import { Plus } from 'lucide-react'
 import { IconPicker } from './IconPicker'
+import { DurationPicker } from './DurationPicker'
 
 interface TodoFormProps {
-  onAdd: (text: string, icon?: string) => void
+  onAdd: (text: string, icon?: string, durationMinutes?: number) => void
 }
 
 export function TodoForm({ onAdd }: TodoFormProps) {
   const [text, setText] = useState('')
   const [icon, setIcon] = useState<string | undefined>(undefined)
+  const [duration, setDuration] = useState<number | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (text.trim()) {
-      onAdd(text.trim(), icon)
+      onAdd(text.trim(), icon, duration)
       setText('')
       setIcon(undefined)
+      setDuration(undefined)
     }
   }
 
@@ -32,6 +35,7 @@ export function TodoForm({ onAdd }: TodoFormProps) {
         aria-label="新增待辦事項"
         className="flex-1"
       />
+      <DurationPicker value={duration} onChange={setDuration} />
       <Button type="submit" size="icon" aria-label="新增" disabled={!text.trim()}>
         <Plus className="h-4 w-4" />
       </Button>

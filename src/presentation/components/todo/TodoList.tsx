@@ -18,19 +18,35 @@ import type { Todo } from '@/domain/entities/Todo'
 interface TodoListProps {
   todos: Todo[]
   nextTodoId: string | null
+  activeTodoId?: string | null  // ID of the active task
+  remainingSeconds?: number  // Remaining time
+  progress?: number  // Progress 0-100
+  isPaused?: boolean  // Whether paused
   onToggle: (id: string) => void
-  onUpdate: (id: string, text: string, icon?: string) => void
+  onUpdate: (id: string, text: string, icon?: string, durationMinutes?: number) => void
   onRemove: (id: string) => void
   onReorder: (fromIndex: number, toIndex: number) => void
+  onStartTask?: (id: string) => void  // Start task
+  onPauseTask?: () => void  // Pause task
+  onResumeTask?: () => void  // Resume task
+  onCompleteTask?: () => void  // Complete task
 }
 
 export function TodoList({
   todos,
   nextTodoId,
+  activeTodoId,
+  remainingSeconds,
+  progress,
+  isPaused,
   onToggle,
   onUpdate,
   onRemove,
   onReorder,
+  onStartTask,
+  onPauseTask,
+  onResumeTask,
+  onCompleteTask,
 }: TodoListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -70,9 +86,17 @@ export function TodoList({
               key={todo.id}
               todo={todo}
               isNext={todo.id === nextTodoId}
+              isActive={todo.id === activeTodoId}
+              remainingSeconds={todo.id === activeTodoId ? remainingSeconds : undefined}
+              progress={todo.id === activeTodoId ? progress : undefined}
+              isPaused={todo.id === activeTodoId ? isPaused : undefined}
               onToggle={onToggle}
               onUpdate={onUpdate}
               onRemove={onRemove}
+              onStartTask={onStartTask}
+              onPauseTask={onPauseTask}
+              onResumeTask={onResumeTask}
+              onCompleteTask={onCompleteTask}
             />
           ))}
         </div>

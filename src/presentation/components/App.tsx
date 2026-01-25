@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useSpeakingClock, useWakeLock, useTodos } from '../hooks'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSpeakingClock, useWakeLock, useTodos, useActiveTask } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
 import { Toggle } from '@/presentation/components/ui/toggle'
@@ -20,6 +20,7 @@ import {
 import { Moon, Sun, Monitor, Download, Check, ListTodo } from 'lucide-react'
 import type { Voice } from '@/domain/entities/Voice'
 import { TodoForm, TodoList } from './todo'
+import { container } from '@/di/container'
 
 const INTERVAL_OPTIONS = [1, 5, 10, 15, 30, 60]
 
@@ -79,10 +80,28 @@ export function App() {
     speakReminder,
   } = useTodos()
 
+  // Use refs to store values needed in handleTimeSpoken callback
+  const activeTaskDataRef = useRef<{
+    activeTodo: typeof activeTodo
+    remainingSeconds: number
+    isPaused: boolean
+    selectedVoiceId: string | null
+  }>({ activeTodo: null, remainingSeconds: 0, isPaused: false, selectedVoiceId: null })
+
   const [isSpeakingReminder, setIsSpeakingReminder] = useState(false)
 
   const handleTimeSpoken = useCallback(() => {
-    if (nextUncompletedTodo) {
+    const { activeTodo, remainingSeconds, isPaused, selectedVoiceId } = activeTaskDataRef.current
+    // If there's an active task running, announce remaining time
+    if (activeTodo && activeTodo.durationMinutes && remainingSeconds > 0 && !isPaused) {
+      setIsSpeakingReminder(true)
+      const remainingMinutes = Math.ceil(remainingSeconds / 60)
+      const message = `${activeTodo.text}，還剩 ${remainingMinutes} 分鐘`
+      container.speechSynthesizer.speak(message, selectedVoiceId ?? undefined, () => {
+        setIsSpeakingReminder(false)
+      })
+    } else if (nextUncompletedTodo) {
+      // Otherwise announce the next uncompleted todo
       setIsSpeakingReminder(true)
       speakReminder(() => setIsSpeakingReminder(false))
     }
@@ -100,6 +119,22 @@ export function App() {
     selectVoice,
     isSpeaking,
   } = useSpeakingClock({ onTimeSpoken: handleTimeSpoken })
+
+  const {
+    activeTodo,
+    startTask,
+    pauseTask,
+    resumeTask,
+    completeTask,
+    remainingSeconds,
+    progress,
+    isPaused,
+  } = useActiveTask(todos, selectedVoiceId)
+
+  // Keep ref in sync with current values
+  useEffect(() => {
+    activeTaskDataRef.current = { activeTodo, remainingSeconds, isPaused, selectedVoiceId }
+  }, [activeTodo, remainingSeconds, isPaused, selectedVoiceId])
 
   // Sync voice selection between clock and reminder
   const handleVoiceChange = useCallback(
@@ -415,10 +450,18 @@ export function App() {
             <TodoList
               todos={todos}
               nextTodoId={nextUncompletedTodo?.id ?? null}
+              activeTodoId={activeTodo?.id ?? null}
+              remainingSeconds={remainingSeconds}
+              progress={progress}
+              isPaused={isPaused}
               onToggle={toggleTodo}
               onUpdate={updateTodo}
               onRemove={removeTodo}
               onReorder={reorderTodos}
+              onStartTask={startTask}
+              onPauseTask={pauseTask}
+              onResumeTask={resumeTask}
+              onCompleteTask={completeTask}
             />
           </CardContent>
         </Card>

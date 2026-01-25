@@ -12,7 +12,7 @@ export class ManageTodosUseCase {
     return this.todoRepository.load()
   }
 
-  add(todoList: TodoList, text: string, icon?: string): TodoList {
+  add(todoList: TodoList, text: string, icon?: string, durationMinutes?: number): TodoList {
     const maxOrder = todoList.items.reduce(
       (max, item) => Math.max(max, item.order),
       -1
@@ -25,6 +25,7 @@ export class ManageTodosUseCase {
       completed: false,
       order: maxOrder + 1,
       createdAt: Date.now(),
+      durationMinutes,
     }
 
     const updatedList: TodoList = {
@@ -35,10 +36,10 @@ export class ManageTodosUseCase {
     return updatedList
   }
 
-  update(todoList: TodoList, id: string, text: string, icon?: string): TodoList {
+  update(todoList: TodoList, id: string, text: string, icon?: string, durationMinutes?: number): TodoList {
     const updatedList: TodoList = {
       items: todoList.items.map((item) =>
-        item.id === id ? { ...item, text: text.trim(), icon } : item
+        item.id === id ? { ...item, text: text.trim(), icon, durationMinutes } : item
       ),
     }
 
