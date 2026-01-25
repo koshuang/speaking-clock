@@ -5,6 +5,13 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.6.1](https://github.com/koshuang/speaking-clock/compare/v1.6.0...v1.6.1) (2026-01-25)
+
+
+### Code Refactoring
+
+* **domain:** extract AnnouncementScheduler use case ([bf83c2f](https://github.com/koshuang/speaking-clock/commit/bf83c2f3a9490b04e562f3237f83f77fb5f7b6be))
+
 ## [1.6.0](https://github.com/koshuang/speaking-clock/compare/v1.5.0...v1.6.0) (2026-01-25)
 
 
