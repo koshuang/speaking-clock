@@ -10,6 +10,7 @@ describe('ManageSettingsUseCase', () => {
   const defaultSettings: ClockSettings = {
     interval: 30,
     enabled: false,
+    childMode: false,
   }
 
   beforeEach(() => {
@@ -29,7 +30,7 @@ describe('ManageSettingsUseCase', () => {
     })
 
     it('應該回傳 repository 回傳的設定', () => {
-      const customSettings: ClockSettings = { interval: 15, enabled: true }
+      const customSettings: ClockSettings = { interval: 15, enabled: true, childMode: false }
       vi.mocked(mockRepository.load).mockReturnValue(customSettings)
 
       const result = useCase.load()
@@ -40,7 +41,7 @@ describe('ManageSettingsUseCase', () => {
 
   describe('save', () => {
     it('應該將設定儲存到 repository', () => {
-      const settings: ClockSettings = { interval: 10, enabled: true }
+      const settings: ClockSettings = { interval: 10, enabled: true, childMode: false }
       useCase.save(settings)
 
       expect(mockRepository.save).toHaveBeenCalledWith(settings)
@@ -49,15 +50,15 @@ describe('ManageSettingsUseCase', () => {
 
   describe('updateInterval', () => {
     it('應該更新間隔並儲存', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const currentSettings: ClockSettings = { interval: 30, enabled: false, childMode: false }
       const result = useCase.updateInterval(currentSettings, 15)
 
-      expect(result).toEqual({ interval: 15, enabled: false })
-      expect(mockRepository.save).toHaveBeenCalledWith({ interval: 15, enabled: false })
+      expect(result).toEqual({ interval: 15, enabled: false, childMode: false })
+      expect(mockRepository.save).toHaveBeenCalledWith({ interval: 15, enabled: false, childMode: false })
     })
 
     it('應該保留其他設定不變', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: true }
+      const currentSettings: ClockSettings = { interval: 30, enabled: true, childMode: false }
       const result = useCase.updateInterval(currentSettings, 60)
 
       expect(result.enabled).toBe(true)
@@ -65,7 +66,7 @@ describe('ManageSettingsUseCase', () => {
     })
 
     it('應該回傳新的設定物件（不修改原物件）', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const currentSettings: ClockSettings = { interval: 30, enabled: false, childMode: false }
       const result = useCase.updateInterval(currentSettings, 15)
 
       expect(result).not.toBe(currentSettings)
@@ -75,30 +76,30 @@ describe('ManageSettingsUseCase', () => {
 
   describe('toggleEnabled', () => {
     it('應該將 enabled 從 false 切換為 true', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const currentSettings: ClockSettings = { interval: 30, enabled: false, childMode: false }
       const result = useCase.toggleEnabled(currentSettings)
 
-      expect(result).toEqual({ interval: 30, enabled: true })
-      expect(mockRepository.save).toHaveBeenCalledWith({ interval: 30, enabled: true })
+      expect(result).toEqual({ interval: 30, enabled: true, childMode: false })
+      expect(mockRepository.save).toHaveBeenCalledWith({ interval: 30, enabled: true, childMode: false })
     })
 
     it('應該將 enabled 從 true 切換為 false', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: true }
+      const currentSettings: ClockSettings = { interval: 30, enabled: true, childMode: false }
       const result = useCase.toggleEnabled(currentSettings)
 
-      expect(result).toEqual({ interval: 30, enabled: false })
-      expect(mockRepository.save).toHaveBeenCalledWith({ interval: 30, enabled: false })
+      expect(result).toEqual({ interval: 30, enabled: false, childMode: false })
+      expect(mockRepository.save).toHaveBeenCalledWith({ interval: 30, enabled: false, childMode: false })
     })
 
     it('應該保留 interval 設定不變', () => {
-      const currentSettings: ClockSettings = { interval: 15, enabled: false }
+      const currentSettings: ClockSettings = { interval: 15, enabled: false, childMode: false }
       const result = useCase.toggleEnabled(currentSettings)
 
       expect(result.interval).toBe(15)
     })
 
     it('應該回傳新的設定物件（不修改原物件）', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const currentSettings: ClockSettings = { interval: 30, enabled: false, childMode: false }
       const result = useCase.toggleEnabled(currentSettings)
 
       expect(result).not.toBe(currentSettings)
@@ -108,19 +109,20 @@ describe('ManageSettingsUseCase', () => {
 
   describe('updateVoiceId', () => {
     it('應該更新語音 ID 並儲存', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const currentSettings: ClockSettings = { interval: 30, enabled: false, childMode: false }
       const result = useCase.updateVoiceId(currentSettings, 'voice-123')
 
-      expect(result).toEqual({ interval: 30, enabled: false, voiceId: 'voice-123' })
+      expect(result).toEqual({ interval: 30, enabled: false, childMode: false, voiceId: 'voice-123' })
       expect(mockRepository.save).toHaveBeenCalledWith({
         interval: 30,
         enabled: false,
+        childMode: false,
         voiceId: 'voice-123',
       })
     })
 
     it('應該保留其他設定不變', () => {
-      const currentSettings: ClockSettings = { interval: 15, enabled: true, voiceId: 'old-voice' }
+      const currentSettings: ClockSettings = { interval: 15, enabled: true, childMode: false, voiceId: 'old-voice' }
       const result = useCase.updateVoiceId(currentSettings, 'new-voice')
 
       expect(result.interval).toBe(15)
@@ -129,7 +131,7 @@ describe('ManageSettingsUseCase', () => {
     })
 
     it('應該回傳新的設定物件（不修改原物件）', () => {
-      const currentSettings: ClockSettings = { interval: 30, enabled: false }
+      const currentSettings: ClockSettings = { interval: 30, enabled: false, childMode: false }
       const result = useCase.updateVoiceId(currentSettings, 'voice-123')
 
       expect(result).not.toBe(currentSettings)

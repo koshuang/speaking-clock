@@ -154,11 +154,18 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
     [manageSettingsUseCase, settings, speakTimeUseCase]
   )
 
+  const toggleChildMode = useCallback(() => {
+    const newSettings = { ...settings, childMode: !settings.childMode }
+    manageSettingsUseCase.save(newSettings)
+    setSettings(newSettings)
+  }, [manageSettingsUseCase, settings])
+
   return {
     currentTime,
     settings,
     updateInterval,
     toggleEnabled,
+    toggleChildMode,
     speakNow,
     voices,
     voicesLoading,

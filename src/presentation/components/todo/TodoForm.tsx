@@ -4,12 +4,15 @@ import { Input } from '@/presentation/components/ui/input'
 import { Plus } from 'lucide-react'
 import { IconPicker } from './IconPicker'
 import { DurationPicker } from './DurationPicker'
+import { TemplatePicker } from './TemplatePicker'
+import type { TaskTemplate } from '@/domain/entities/TaskTemplate'
 
 interface TodoFormProps {
   onAdd: (text: string, icon?: string, durationMinutes?: number) => void
+  childMode?: boolean
 }
 
-export function TodoForm({ onAdd }: TodoFormProps) {
+export function TodoForm({ onAdd, childMode = false }: TodoFormProps) {
   const [text, setText] = useState('')
   const [icon, setIcon] = useState<string | undefined>(undefined)
   const [duration, setDuration] = useState<number | undefined>(undefined)
@@ -24,8 +27,13 @@ export function TodoForm({ onAdd }: TodoFormProps) {
     }
   }
 
+  const handleTemplateSelect = (template: TaskTemplate) => {
+    onAdd(template.name, template.icon, template.durationMinutes)
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex items-center gap-1.5">
+      <TemplatePicker onSelect={handleTemplateSelect} childMode={childMode} />
       <IconPicker value={icon} onChange={setIcon} />
       <Input
         type="text"

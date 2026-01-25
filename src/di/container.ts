@@ -11,12 +11,16 @@ import {
   IntervalOptionsUseCase,
   DurationOptionsUseCase,
   PostAnnouncementUseCase,
+  TaskTemplateUseCase,
+  CompletionFeedbackUseCase,
+  ChildModeSettingsUseCase,
 } from '../domain/usecases'
 import {
   WebSpeechSynthesizer,
   LocalStorageSettingsRepository,
   LocalStorageTodoRepository,
   ScreenWakeLockManager,
+  SoundEffectPlayer,
 } from '../infrastructure'
 import { SessionStorageActiveTaskStateRepository } from '../infrastructure/repositories/ActiveTaskStateRepository'
 
@@ -26,6 +30,7 @@ const settingsRepository = new LocalStorageSettingsRepository()
 const todoRepository = new LocalStorageTodoRepository()
 const wakeLockManager = new ScreenWakeLockManager()
 const activeTaskStateRepository = new SessionStorageActiveTaskStateRepository()
+const soundEffectPlayer = new SoundEffectPlayer()
 
 // Use case instances
 const speakTimeUseCase = new SpeakTimeUseCase(speechSynthesizer)
@@ -40,6 +45,9 @@ const voiceSelectorUseCase = new VoiceSelectorUseCase()
 const intervalOptionsUseCase = new IntervalOptionsUseCase()
 const durationOptionsUseCase = new DurationOptionsUseCase()
 const postAnnouncementUseCase = new PostAnnouncementUseCase(taskReminderTextGenerator)
+const taskTemplateUseCase = new TaskTemplateUseCase()
+const completionFeedbackUseCase = new CompletionFeedbackUseCase()
+const childModeSettingsUseCase = new ChildModeSettingsUseCase()
 
 export const container = {
   speechSynthesizer,
@@ -47,6 +55,7 @@ export const container = {
   todoRepository,
   wakeLockManager,
   activeTaskStateRepository,
+  soundEffectPlayer,
   speakTimeUseCase,
   manageSettingsUseCase,
   manageTodosUseCase,
@@ -59,4 +68,7 @@ export const container = {
   intervalOptionsUseCase,
   durationOptionsUseCase,
   postAnnouncementUseCase,
+  taskTemplateUseCase,
+  completionFeedbackUseCase,
+  childModeSettingsUseCase,
 }

@@ -27,7 +27,7 @@ const formatVoiceName = (voice: Voice): string => {
     'zh_HK': '香港',
   }
 
-  let displayName = voice.name
+  const displayName = voice.name
     .replace(/^(Google|Microsoft|Apple)\s+/i, '')
     .replace(/^(Chinese|Mandarin|Cantonese)\s+/i, '')
 
@@ -48,6 +48,7 @@ interface SettingsPanelProps {
   onVoiceChange: (voiceId: string) => void
   onToggleWakeLock: () => void
   onSpeakNow: () => void
+  onToggleChildMode: () => void
 }
 
 export function SettingsPanel({
@@ -62,6 +63,7 @@ export function SettingsPanel({
   onVoiceChange,
   onToggleWakeLock,
   onSpeakNow,
+  onToggleChildMode,
 }: SettingsPanelProps) {
   const [isCustomInterval, setIsCustomInterval] = useState(false)
   const [customIntervalValue, setCustomIntervalValue] = useState('')
@@ -144,6 +146,25 @@ export function SettingsPanel({
           </p>
         </div>
       )}
+
+      {/* Child Mode Toggle */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">兒童模式</span>
+          <Toggle
+            pressed={settings.childMode}
+            onPressedChange={onToggleChildMode}
+            variant="outline"
+            aria-label={settings.childMode ? '關閉兒童模式' : '開啟兒童模式'}
+            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+          >
+            {settings.childMode ? '已開啟' : '已關閉'}
+          </Toggle>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          開啟後顯示大按鈕、慢速語音，適合小朋友使用
+        </p>
+      </div>
 
       {/* Interval Selection */}
       <div className="space-y-2">

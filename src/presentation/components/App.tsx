@@ -13,6 +13,7 @@ import { Moon, Sun, Monitor, Download, Volume2, VolumeX, Play, Pause, Check, Tim
 import { TodoForm, TodoList, TodoIcon } from './todo'
 import { SettingsPanel } from './settings'
 import { BottomNav, type TabId } from './layout'
+import { CelebrationAnimation } from './feedback/CelebrationAnimation'
 import { container } from '@/di/container'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -29,6 +30,7 @@ export function App() {
 
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
+  const [showCelebration, setShowCelebration] = useState(false)
 
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('onboarding-completed')
@@ -90,6 +92,7 @@ export function App() {
     settings,
     updateInterval,
     toggleEnabled,
+    toggleChildMode,
     speakNow,
     voices,
     voicesLoading,
@@ -135,8 +138,18 @@ export function App() {
     if (activeTodo) {
       toggleTodo(activeTodo.id)
     }
+
+    // Child mode celebration
+    if (settings.childMode) {
+      setShowCelebration(true)
+      container.soundEffectPlayer.playCompletionSound()
+      const phrase = container.completionFeedbackUseCase.getRandomCompletionPhrase()
+      const rate = container.childModeSettingsUseCase.getChildModeSpeechRate()
+      container.speechSynthesizer.speak(phrase, selectedVoiceId ?? undefined, undefined, rate)
+    }
+
     completeTask()
-  }, [activeTodo, toggleTodo, completeTask])
+  }, [activeTodo, toggleTodo, completeTask, settings.childMode, selectedVoiceId])
 
   const {
     isSupported: wakeLockSupported,
@@ -214,7 +227,7 @@ export function App() {
   const uncompletedTodoCount = container.manageTodosUseCase.getUncompletedCount({ items: todos })
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className={`flex min-h-screen flex-col bg-background ${settings.childMode ? 'child-mode' : ''}`}>
       {/* Fixed Header */}
       <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto flex h-11 max-w-md items-center justify-between px-4">
@@ -424,7 +437,7 @@ export function App() {
                     報時後會語音提醒下一個待辦事項
                   </p>
                 </div>
-                <TodoForm onAdd={addTodo} />
+                <TodoForm onAdd={addTodo} childMode={settings.childMode} />
                 <TodoList
                   todos={todos}
                   nextTodoId={nextUncompletedTodo?.id ?? null}
@@ -460,6 +473,7 @@ export function App() {
                   onVoiceChange={handleVoiceChange}
                   onToggleWakeLock={toggleWakeLock}
                   onSpeakNow={speakNow}
+                  onToggleChildMode={toggleChildMode}
                 />
               </CardContent>
             </Card>
@@ -505,6 +519,9 @@ export function App() {
           </Card>
         </div>
       )}
+
+      {/* Celebration Animation */}
+      <CelebrationAnimation show={showCelebration} onComplete={() => setShowCelebration(false)} />
     </div>
   )
 }

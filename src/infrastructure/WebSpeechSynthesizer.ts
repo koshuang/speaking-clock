@@ -32,7 +32,7 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
     }))
   }
 
-  speak(text: string, voiceId?: string, onEnd?: () => void): void {
+  speak(text: string, voiceId?: string, onEnd?: () => void, rate: number = 1): void {
     if (typeof speechSynthesis === 'undefined') {
       console.error('瀏覽器不支援語音合成')
       return
@@ -49,7 +49,7 @@ export class WebSpeechSynthesizer implements SpeechSynthesizer {
       }
     }
 
-    utterance.rate = 1
+    utterance.rate = rate
     utterance.pitch = 1
     utterance.volume = 1
 
