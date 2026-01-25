@@ -307,7 +307,7 @@ export function App() {
 
           {/* Clock Display - Always visible */}
           <Card
-            className={`cursor-pointer bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-shadow hover:shadow-lg active:scale-[0.99] ${isSpeaking ? 'animate-pulse ring-4 ring-primary/50' : ''}`}
+            className={`cursor-pointer bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-shadow hover:shadow-lg active:scale-[0.99] py-2 ${isSpeaking ? 'animate-pulse ring-4 ring-primary/50' : ''}`}
             onClick={speakNow}
             role="button"
             tabIndex={0}
@@ -319,7 +319,7 @@ export function App() {
             }}
             aria-label="點擊報時"
           >
-            <CardContent className="py-2 text-center">
+            <CardContent className="py-0 text-center">
               <div className="text-[11px] opacity-90">{formatDisplayDate(currentTime)}</div>
               <div className="font-mono text-2xl font-bold tracking-wider">
                 {formatDisplayTime(currentTime)}
