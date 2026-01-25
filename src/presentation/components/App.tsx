@@ -215,18 +215,26 @@ export function App() {
 
   const getNextAnnouncementTime = (currentTime: Date, interval: number): string => {
     const minutes = currentTime.getMinutes()
-    const nextMinute = Math.ceil(minutes / interval) * interval
+    const seconds = currentTime.getSeconds()
+
+    // Find next minute that is divisible by interval
+    // If currently at an interval minute and past first 2 seconds, go to next one
+    const isAtInterval = minutes % interval === 0
+    const isPastTrigger = seconds >= 2
+
+    let nextMinute: number
+    if (isAtInterval && !isPastTrigger) {
+      // Will trigger soon (within 2 seconds)
+      nextMinute = minutes
+    } else {
+      // Find next interval minute
+      nextMinute = (Math.floor(minutes / interval) + 1) * interval
+    }
 
     const next = new Date(currentTime)
     if (nextMinute >= 60) {
       next.setHours(next.getHours() + 1)
       next.setMinutes(nextMinute - 60)
-    } else if (nextMinute === minutes && minutes % interval === 0) {
-      next.setMinutes(minutes + interval)
-      if (next.getMinutes() >= 60) {
-        next.setHours(next.getHours() + 1)
-        next.setMinutes(next.getMinutes() - 60)
-      }
     } else {
       next.setMinutes(nextMinute)
     }
@@ -311,14 +319,14 @@ export function App() {
             }}
             aria-label="點擊報時"
           >
-            <CardContent className="py-4 text-center">
+            <CardContent className="py-3 text-center">
               <div className="text-xs opacity-90">{formatDisplayDate(currentTime)}</div>
-              <div className="mt-1 font-mono text-3xl font-bold tracking-wider">
+              <div className="font-mono text-3xl font-bold tracking-wider">
                 {formatDisplayTime(currentTime)}
               </div>
-              <div className="mt-1 text-xs opacity-70">
+              <div className="text-[11px] opacity-70">
                 {settings.enabled
-                  ? `下次報時：${getNextAnnouncementTime(currentTime, settings.interval)}`
+                  ? `下次報時 ${getNextAnnouncementTime(currentTime, settings.interval)}`
                   : '點擊可報時'}
               </div>
             </CardContent>
