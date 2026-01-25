@@ -1,9 +1,4 @@
 {
-  "project": {
-    "name": "speaking-clock",
-    "description": "語音報時器 PWA 應用程式",
-    "language": "zh-TW"
-  },
   "permissions": {
     "allow": [
       "Bash(npm run *)",
@@ -16,6 +11,11 @@
       "Bash(rm -rf /)",
       "Bash(sudo *)"
     ]
+  },
+  "project": {
+    "name": "speaking-clock",
+    "description": "語音報時器 PWA 應用程式",
+    "language": "zh-TW"
   },
   "context": {
     "includeFiles": [
@@ -32,5 +32,8 @@
       "dist/**",
       "*.log"
     ]
+  },
+  "enabledPlugins": {
+    "oh-my-claudecode@omc": true
   }
 }

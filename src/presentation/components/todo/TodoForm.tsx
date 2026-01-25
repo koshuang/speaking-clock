@@ -25,18 +25,18 @@ export function TodoForm({ onAdd }: TodoFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
+    <form onSubmit={handleSubmit} className="flex items-center gap-1.5">
       <IconPicker value={icon} onChange={setIcon} />
       <Input
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="輸入待辦事項..."
+        placeholder="新增待辦..."
         aria-label="新增待辦事項"
-        className="flex-1"
+        className="flex-1 min-w-0"
       />
-      <DurationPicker value={duration} onChange={setDuration} />
-      <Button type="submit" size="icon" aria-label="新增" disabled={!text.trim()}>
+      <DurationPicker value={duration} onChange={setDuration} compact />
+      <Button type="submit" size="icon" aria-label="新增" disabled={!text.trim()} className="shrink-0">
         <Plus className="h-4 w-4" />
       </Button>
     </form>

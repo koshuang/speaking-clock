@@ -13,6 +13,7 @@ interface DurationPickerProps {
   onChange: (duration: number | undefined) => void;
   className?: string;
   size?: 'default' | 'sm'; // For different contexts
+  compact?: boolean; // Show only icon when no value
 }
 
 const PRESET_DURATIONS = [5, 10, 15, 20, 30, 45, 60];
@@ -22,6 +23,7 @@ export function DurationPicker({
   onChange,
   className,
   size = 'default',
+  compact = false,
 }: DurationPickerProps) {
   const handleValueChange = (selectedValue: string) => {
     if (selectedValue === 'none') {
@@ -31,6 +33,8 @@ export function DurationPicker({
     }
   };
 
+  const isSmall = size === 'sm' || compact;
+
   return (
     <Select
       value={value?.toString() ?? 'none'}
@@ -38,19 +42,28 @@ export function DurationPicker({
     >
       <SelectTrigger
         className={cn(
-          'gap-2',
-          size === 'sm' ? 'h-8 w-24 text-xs' : 'w-32',
+          'gap-1 shrink-0',
+          isSmall ? 'h-8 text-xs' : '',
+          compact
+            ? value
+              ? 'w-16 px-2'
+              : 'w-9 px-0 justify-center'
+            : size === 'sm'
+              ? 'w-20 px-2'
+              : 'w-28',
           className
         )}
       >
-        <Clock className={cn('shrink-0', size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')} />
-        <SelectValue placeholder="不計時" />
+        <Clock className={cn('shrink-0', isSmall ? 'h-3.5 w-3.5' : 'h-4 w-4')} />
+        {(!compact || value) && (
+          <SelectValue placeholder={compact ? '' : '不計時'} />
+        )}
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="none">不計時</SelectItem>
         {PRESET_DURATIONS.map((duration) => (
           <SelectItem key={duration} value={duration.toString()}>
-            {duration}分鐘
+            {duration}分
           </SelectItem>
         ))}
       </SelectContent>
