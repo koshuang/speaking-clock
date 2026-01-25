@@ -5,6 +5,26 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.5.0](https://github.com/koshuang/speaking-clock/compare/v1.4.0...v1.5.0) (2026-01-25)
+
+
+### Features
+
+* **ui:** add bottom tab navigation for mobile UX ([daeb02f](https://github.com/koshuang/speaking-clock/commit/daeb02f84a92eac356ebe8e97f2abd6cbb643d2c))
+
+
+### Bug Fixes
+
+* **ui:** fix DurationPicker click not working in compact mode ([294151b](https://github.com/koshuang/speaking-clock/commit/294151bd51162bf6d7dbd690cff94666d527222d))
+* **ui:** further reduce clock padding and fix next announcement time ([c5f1d57](https://github.com/koshuang/speaking-clock/commit/c5f1d57706e02119d835502fcc993cff014f2b7f))
+* **ui:** move announcement toggle to clock tab homepage ([6c94dd1](https://github.com/koshuang/speaking-clock/commit/6c94dd146c4b5ef237df0dec41281a322e4ea607))
+* **ui:** optimize todo list spacing for mobile ([3ca19c8](https://github.com/koshuang/speaking-clock/commit/3ca19c897f93c18d5741ed9853cca2163654227b))
+* **ui:** reduce Card component default padding ([013c296](https://github.com/koshuang/speaking-clock/commit/013c2963686ec4cc4c7ed730a50b658a055b9365))
+* **ui:** reduce clock card height ([c01ecbc](https://github.com/koshuang/speaking-clock/commit/c01ecbca187f284953df3d3f7e561fac31f1613b))
+* **ui:** reduce clock card padding further ([cf2de13](https://github.com/koshuang/speaking-clock/commit/cf2de13c27f6662aee36d07cfeaa2331647421db))
+* **ui:** reduce clock card size for more content space ([230c0ff](https://github.com/koshuang/speaking-clock/commit/230c0fff76c70a7aaf1cf5446adb5f29f2274fc3))
+* **ui:** reduce container padding for more content space ([09cd9f0](https://github.com/koshuang/speaking-clock/commit/09cd9f001af2ff9e80317b1d7ba6ccbb9c9e3630))
+
 ## [1.4.0](https://github.com/koshuang/speaking-clock/compare/v1.3.0...v1.4.0) (2026-01-25)
 
 
