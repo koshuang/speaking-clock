@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { Toggle } from '@/presentation/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/presentation/components/ui/toggle-group'
 import {
@@ -8,7 +9,8 @@ import {
   SelectValue,
 } from '@/presentation/components/ui/select'
 import { Button } from '@/presentation/components/ui/button'
-import { Check } from 'lucide-react'
+import { Input } from '@/presentation/components/ui/input'
+import { Check, X } from 'lucide-react'
 import type { Voice } from '@/domain/entities/Voice'
 import type { ClockSettings } from '@/domain/entities/ClockSettings'
 
@@ -60,6 +62,51 @@ export function SettingsPanel({
   onToggleWakeLock,
   onSpeakNow,
 }: SettingsPanelProps) {
+  const [isCustomInterval, setIsCustomInterval] = useState(false)
+  const [customIntervalValue, setCustomIntervalValue] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Check if current interval is a preset
+  const isPresetInterval = INTERVAL_OPTIONS.includes(settings.interval)
+
+  // Focus input when entering custom mode
+  useEffect(() => {
+    if (isCustomInterval && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [isCustomInterval])
+
+  const handleIntervalChange = (value: string) => {
+    if (value === 'custom') {
+      setIsCustomInterval(true)
+      setCustomIntervalValue(settings.interval.toString())
+    } else if (value) {
+      onUpdateInterval(Number(value))
+      setIsCustomInterval(false)
+    }
+  }
+
+  const handleCustomConfirm = () => {
+    const num = parseInt(customIntervalValue, 10)
+    if (num > 0 && num <= 60) {
+      onUpdateInterval(num)
+      setIsCustomInterval(false)
+    }
+  }
+
+  const handleCustomCancel = () => {
+    setIsCustomInterval(false)
+    setCustomIntervalValue('')
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCustomConfirm()
+    } else if (e.key === 'Escape') {
+      handleCustomCancel()
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Announcement Toggle */}
@@ -100,26 +147,66 @@ export function SettingsPanel({
       {/* Interval Selection */}
       <div className="space-y-2">
         <span className="text-sm font-medium">報時間隔</span>
-        <ToggleGroup
-          type="single"
-          value={String(settings.interval)}
-          onValueChange={(value) => value && onUpdateInterval(Number(value))}
-          variant="outline"
-          aria-label="選擇報時間隔"
-          className="flex flex-wrap justify-start gap-2"
-        >
-          {INTERVAL_OPTIONS.map((interval) => (
+        {isCustomInterval ? (
+          <div className="flex items-center gap-2">
+            <Input
+              ref={inputRef}
+              type="number"
+              min="1"
+              max="60"
+              value={customIntervalValue}
+              onChange={(e) => setCustomIntervalValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-20"
+              placeholder="分鐘"
+            />
+            <span className="text-sm text-muted-foreground">分鐘</span>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleCustomConfirm}
+              disabled={!customIntervalValue || parseInt(customIntervalValue, 10) <= 0 || parseInt(customIntervalValue, 10) > 60}
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={handleCustomCancel}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <ToggleGroup
+            type="single"
+            value={isPresetInterval ? String(settings.interval) : 'custom'}
+            onValueChange={handleIntervalChange}
+            variant="outline"
+            aria-label="選擇報時間隔"
+            className="flex flex-wrap justify-start gap-2"
+          >
+            {INTERVAL_OPTIONS.map((interval) => (
+              <ToggleGroupItem
+                key={interval}
+                value={String(interval)}
+                aria-label={`每 ${interval} 分鐘報時`}
+                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground gap-1"
+              >
+                {settings.interval === interval && <Check className="h-4 w-4" />}
+                {interval} 分鐘
+              </ToggleGroupItem>
+            ))}
             <ToggleGroupItem
-              key={interval}
-              value={String(interval)}
-              aria-label={`每 ${interval} 分鐘報時`}
+              value="custom"
+              aria-label="自訂報時間隔"
               className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground gap-1"
             >
-              {settings.interval === interval && <Check className="h-4 w-4" />}
-              {interval} 分鐘
+              {!isPresetInterval && <Check className="h-4 w-4" />}
+              {!isPresetInterval ? `${settings.interval} 分鐘` : '自訂'}
             </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+          </ToggleGroup>
+        )}
       </div>
 
       {/* Voice Selection */}

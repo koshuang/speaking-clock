@@ -1,4 +1,5 @@
-import { Clock } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Clock, Check, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -6,6 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/presentation/components/ui/select';
+import { Input } from '@/presentation/components/ui/input';
+import { Button } from '@/presentation/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface DurationPickerProps {
@@ -25,20 +28,103 @@ export function DurationPicker({
   size = 'default',
   compact = false,
 }: DurationPickerProps) {
+  const [isCustomMode, setIsCustomMode] = useState(false);
+  const [customValue, setCustomValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Check if current value is a preset
+  const isPresetValue = value === undefined || PRESET_DURATIONS.includes(value);
+
+  // Focus input when entering custom mode
+  useEffect(() => {
+    if (isCustomMode && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isCustomMode]);
+
   const handleValueChange = (selectedValue: string) => {
     if (selectedValue === 'none') {
       onChange(undefined);
+      setIsCustomMode(false);
+    } else if (selectedValue === 'custom') {
+      setIsCustomMode(true);
+      setCustomValue(value?.toString() ?? '');
     } else {
       onChange(Number(selectedValue));
+      setIsCustomMode(false);
+    }
+  };
+
+  const handleCustomConfirm = () => {
+    const num = parseInt(customValue, 10);
+    if (num > 0 && num <= 999) {
+      onChange(num);
+      setIsCustomMode(false);
+    }
+  };
+
+  const handleCustomCancel = () => {
+    setIsCustomMode(false);
+    setCustomValue('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCustomConfirm();
+    } else if (e.key === 'Escape') {
+      handleCustomCancel();
     }
   };
 
   const isSmall = size === 'sm' || compact;
   const hideValue = compact && !value;
 
+  // Custom input mode
+  if (isCustomMode) {
+    return (
+      <div className={cn('flex items-center gap-1', className)}>
+        <Input
+          ref={inputRef}
+          type="number"
+          min="1"
+          max="999"
+          value={customValue}
+          onChange={(e) => setCustomValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className={cn('w-16 h-9 text-xs px-2', isSmall && 'h-8')}
+          placeholder="分鐘"
+        />
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={handleCustomConfirm}
+          className="h-8 w-8"
+          disabled={!customValue || parseInt(customValue, 10) <= 0}
+        >
+          <Check className="h-4 w-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={handleCustomCancel}
+          className="h-8 w-8"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  // Get display value for Select
+  const selectValue = value === undefined
+    ? 'none'
+    : isPresetValue
+      ? value.toString()
+      : 'custom';
+
   return (
     <Select
-      value={value?.toString() ?? 'none'}
+      value={selectValue}
       onValueChange={handleValueChange}
     >
       <SelectTrigger
@@ -58,7 +144,9 @@ export function DurationPicker({
       >
         <Clock className="h-4 w-4 shrink-0" />
         <span className={hideValue ? 'sr-only' : ''}>
-          <SelectValue placeholder={compact ? '' : '不計時'} />
+          <SelectValue placeholder={compact ? '' : '不計時'}>
+            {value === undefined ? (compact ? '' : '不計時') : `${value}分`}
+          </SelectValue>
         </span>
       </SelectTrigger>
       <SelectContent>
@@ -68,6 +156,7 @@ export function DurationPicker({
             {duration}分
           </SelectItem>
         ))}
+        <SelectItem value="custom">自訂...</SelectItem>
       </SelectContent>
     </Select>
   );
