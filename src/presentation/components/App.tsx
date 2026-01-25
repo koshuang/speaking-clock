@@ -291,7 +291,7 @@ export function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto pb-20">
-        <div className="mx-auto max-w-md space-y-4 p-4">
+        <div className="mx-auto max-w-md space-y-3 px-3 pt-2">
           {/* Install Prompt */}
           {showInstallButton && (
             <Card className="border-primary/20 bg-primary/10">
