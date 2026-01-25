@@ -1,0 +1,57 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":timezone(Asia/Taipei)"
+  ],
+  "schedule": ["before 9am on monday"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "pin",
+  "packageRules": [
+    {
+      "description": "Patch and minor updates - auto merge",
+      "matchUpdateTypes": ["patch", "minor"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "Major updates - require manual review",
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "breaking"]
+    },
+    {
+      "description": "Group all non-major dev dependencies",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "dev dependencies (non-major)",
+      "automerge": true
+    },
+    {
+      "description": "Group React ecosystem",
+      "matchPackagePatterns": ["^react", "^@types/react"],
+      "groupName": "React"
+    },
+    {
+      "description": "Group Vite ecosystem",
+      "matchPackagePatterns": ["^vite", "^@vitejs"],
+      "groupName": "Vite"
+    },
+    {
+      "description": "Group testing tools",
+      "matchPackagePatterns": ["vitest", "^@testing-library"],
+      "groupName": "testing tools"
+    },
+    {
+      "description": "Group TypeScript and ESLint",
+      "matchPackagePatterns": ["typescript", "eslint", "^@typescript-eslint"],
+      "groupName": "TypeScript and linting"
+    },
+    {
+      "description": "Group Tailwind CSS",
+      "matchPackagePatterns": ["tailwind"],
+      "groupName": "Tailwind CSS"
+    }
+  ]
+}
