@@ -13,8 +13,9 @@ import { Input } from '@/presentation/components/ui/input'
 import { Check, X } from 'lucide-react'
 import type { Voice } from '@/domain/entities/Voice'
 import type { ClockSettings } from '@/domain/entities/ClockSettings'
+import { container } from '@/di/container'
 
-const INTERVAL_OPTIONS = [1, 5, 10, 15, 30, 60]
+const { intervalOptionsUseCase } = container
 
 const formatVoiceName = (voice: Voice): string => {
   const langMap: Record<string, string> = {
@@ -67,7 +68,7 @@ export function SettingsPanel({
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Check if current interval is a preset
-  const isPresetInterval = INTERVAL_OPTIONS.includes(settings.interval)
+  const isPresetInterval = intervalOptionsUseCase.isPreset(settings.interval)
 
   // Focus input when entering custom mode
   useEffect(() => {
@@ -88,7 +89,7 @@ export function SettingsPanel({
 
   const handleCustomConfirm = () => {
     const num = parseInt(customIntervalValue, 10)
-    if (num > 0 && num <= 60) {
+    if (intervalOptionsUseCase.isValid(num)) {
       onUpdateInterval(num)
       setIsCustomInterval(false)
     }
@@ -152,8 +153,8 @@ export function SettingsPanel({
             <Input
               ref={inputRef}
               type="number"
-              min="1"
-              max="60"
+              min={intervalOptionsUseCase.getMinInterval()}
+              max={intervalOptionsUseCase.getMaxInterval()}
               value={customIntervalValue}
               onChange={(e) => setCustomIntervalValue(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -165,7 +166,7 @@ export function SettingsPanel({
               size="icon"
               variant="ghost"
               onClick={handleCustomConfirm}
-              disabled={!customIntervalValue || parseInt(customIntervalValue, 10) <= 0 || parseInt(customIntervalValue, 10) > 60}
+              disabled={!customIntervalValue || !intervalOptionsUseCase.isValid(parseInt(customIntervalValue, 10))}
             >
               <Check className="h-4 w-4" />
             </Button>
@@ -186,7 +187,7 @@ export function SettingsPanel({
             aria-label="選擇報時間隔"
             className="flex flex-wrap justify-start gap-2"
           >
-            {INTERVAL_OPTIONS.map((interval) => (
+            {intervalOptionsUseCase.getPresets().map((interval) => (
               <ToggleGroupItem
                 key={interval}
                 value={String(interval)}

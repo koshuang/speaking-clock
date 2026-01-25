@@ -8,6 +8,9 @@ import {
   AnnouncementScheduler,
   DisplayTimeFormatter,
   VoiceSelectorUseCase,
+  IntervalOptionsUseCase,
+  DurationOptionsUseCase,
+  PostAnnouncementUseCase,
 } from '../domain/usecases'
 import {
   WebSpeechSynthesizer,
@@ -34,6 +37,9 @@ const taskReminderTextGenerator = new TaskReminderTextGenerator()
 const announcementScheduler = new AnnouncementScheduler()
 const displayTimeFormatter = new DisplayTimeFormatter()
 const voiceSelectorUseCase = new VoiceSelectorUseCase()
+const intervalOptionsUseCase = new IntervalOptionsUseCase()
+const durationOptionsUseCase = new DurationOptionsUseCase()
+const postAnnouncementUseCase = new PostAnnouncementUseCase(taskReminderTextGenerator)
 
 export const container = {
   speechSynthesizer,
@@ -50,4 +56,7 @@ export const container = {
   announcementScheduler,
   displayTimeFormatter,
   voiceSelectorUseCase,
+  intervalOptionsUseCase,
+  durationOptionsUseCase,
+  postAnnouncementUseCase,
 }

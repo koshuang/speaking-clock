@@ -235,4 +235,42 @@ describe('ManageTodosUseCase', () => {
       expect(result[2].id).toBe('1') // order 2
     })
   })
+
+  describe('getUncompletedCount', () => {
+    it('應該回傳未完成項目的數量', () => {
+      // mockTodoList 有 2 個未完成，1 個已完成
+      const result = useCase.getUncompletedCount(mockTodoList)
+      expect(result).toBe(2)
+    })
+
+    it('全部完成時應該回傳 0', () => {
+      const allCompletedList: TodoList = {
+        items: [
+          { id: '1', text: '已完成一', completed: true, order: 0, createdAt: 1000 },
+          { id: '2', text: '已完成二', completed: true, order: 1, createdAt: 2000 },
+        ],
+      }
+
+      const result = useCase.getUncompletedCount(allCompletedList)
+      expect(result).toBe(0)
+    })
+
+    it('全部未完成時應該回傳總數', () => {
+      const allUncompletedList: TodoList = {
+        items: [
+          { id: '1', text: '未完成一', completed: false, order: 0, createdAt: 1000 },
+          { id: '2', text: '未完成二', completed: false, order: 1, createdAt: 2000 },
+          { id: '3', text: '未完成三', completed: false, order: 2, createdAt: 3000 },
+        ],
+      }
+
+      const result = useCase.getUncompletedCount(allUncompletedList)
+      expect(result).toBe(3)
+    })
+
+    it('清單為空時應該回傳 0', () => {
+      const result = useCase.getUncompletedCount({ items: [] })
+      expect(result).toBe(0)
+    })
+  })
 })

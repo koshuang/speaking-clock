@@ -10,6 +10,9 @@ import {
 import { Input } from '@/presentation/components/ui/input';
 import { Button } from '@/presentation/components/ui/button';
 import { cn } from '@/lib/utils';
+import { container } from '@/di/container';
+
+const { durationOptionsUseCase } = container;
 
 interface DurationPickerProps {
   value?: number; // Duration in minutes (undefined means no duration)
@@ -18,8 +21,6 @@ interface DurationPickerProps {
   size?: 'default' | 'sm'; // For different contexts
   compact?: boolean; // Show only icon when no value
 }
-
-const PRESET_DURATIONS = [5, 10, 15, 20, 30, 45, 60];
 
 export function DurationPicker({
   value,
@@ -33,7 +34,7 @@ export function DurationPicker({
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Check if current value is a preset
-  const isPresetValue = value === undefined || PRESET_DURATIONS.includes(value);
+  const isPresetValue = value === undefined || durationOptionsUseCase.isPreset(value);
 
   // Focus input when entering custom mode
   useEffect(() => {
@@ -57,7 +58,7 @@ export function DurationPicker({
 
   const handleCustomConfirm = () => {
     const num = parseInt(customValue, 10);
-    if (num > 0 && num <= 999) {
+    if (durationOptionsUseCase.isValid(num)) {
       onChange(num);
       setIsCustomMode(false);
     }
@@ -86,8 +87,8 @@ export function DurationPicker({
         <Input
           ref={inputRef}
           type="number"
-          min="1"
-          max="999"
+          min={durationOptionsUseCase.getMinDuration()}
+          max={durationOptionsUseCase.getMaxDuration()}
           value={customValue}
           onChange={(e) => setCustomValue(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -99,7 +100,7 @@ export function DurationPicker({
           variant="ghost"
           onClick={handleCustomConfirm}
           className="h-8 w-8"
-          disabled={!customValue || parseInt(customValue, 10) <= 0}
+          disabled={!customValue || !durationOptionsUseCase.isValid(parseInt(customValue, 10))}
         >
           <Check className="h-4 w-4" />
         </Button>
@@ -151,7 +152,7 @@ export function DurationPicker({
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="none">不計時</SelectItem>
-        {PRESET_DURATIONS.map((duration) => (
+        {durationOptionsUseCase.getPresets().map((duration) => (
           <SelectItem key={duration} value={duration.toString()}>
             {duration}分
           </SelectItem>

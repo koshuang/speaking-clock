@@ -63,16 +63,23 @@ export function App() {
 
   const handleTimeSpoken = useCallback(() => {
     const { activeTodo, remainingSeconds, isPaused, selectedVoiceId } = activeTaskDataRef.current
-    // If there's an active task running, announce remaining time
-    if (activeTodo && activeTodo.durationMinutes && remainingSeconds > 0 && !isPaused) {
+    const announcement = container.postAnnouncementUseCase.getNextAnnouncement({
+      activeTodo,
+      activeTaskState: activeTodo && !isPaused
+        ? { todoId: activeTodo.id, status: 'active', startedAt: 0, accumulatedTime: 0 }
+        : activeTodo && isPaused
+          ? { todoId: activeTodo.id, status: 'paused', startedAt: 0, accumulatedTime: 0 }
+          : null,
+      remainingSeconds,
+      nextUncompletedTodo,
+    })
+
+    if (announcement.type === 'active_task' && announcement.message) {
       setIsSpeakingReminder(true)
-      const remainingMinutes = Math.ceil(remainingSeconds / 60)
-      const message = `${activeTodo.text}，還剩 ${remainingMinutes} 分鐘`
-      container.speechSynthesizer.speak(message, selectedVoiceId ?? undefined, () => {
+      container.speechSynthesizer.speak(announcement.message, selectedVoiceId ?? undefined, () => {
         setIsSpeakingReminder(false)
       })
-    } else if (nextUncompletedTodo) {
-      // Otherwise announce the next uncompleted todo
+    } else if (announcement.type === 'next_todo') {
       setIsSpeakingReminder(true)
       speakReminder(() => setIsSpeakingReminder(false))
     }
@@ -204,7 +211,7 @@ export function App() {
   }
 
   // Count uncompleted todos for badge
-  const uncompletedTodoCount = todos.filter((t) => !t.completed).length
+  const uncompletedTodoCount = container.manageTodosUseCase.getUncompletedCount({ items: todos })
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

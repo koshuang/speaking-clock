@@ -93,4 +93,14 @@ export class ManageTodosUseCase {
   getSortedItems(todoList: TodoList): Todo[] {
     return [...todoList.items].sort((a, b) => a.order - b.order)
   }
+
+  /**
+   * Get count of uncompleted todos
+   *
+   * @param todoList - The todo list to count from
+   * @returns Number of uncompleted todos
+   */
+  getUncompletedCount(todoList: TodoList): number {
+    return todoList.items.filter((item) => !item.completed).length
+  }
 }
