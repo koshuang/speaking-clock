@@ -335,8 +335,8 @@ export function App() {
           {/* Tab Content */}
           {activeTab === 'clock' && (
             <>
-              {/* Active Task */}
-              {activeTodo && activeTodo.durationMinutes && (
+              {/* Active Task - Running */}
+              {activeTodo && activeTodo.durationMinutes ? (
                 <Card className="border-primary bg-primary/5">
                   <CardContent className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -379,7 +379,46 @@ export function App() {
                     </div>
                   </CardContent>
                 </Card>
-              )}
+              ) : nextUncompletedTodo ? (
+                /* Next Task - Not Started */
+                <Card className="border-primary/50">
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {nextUncompletedTodo.icon && (
+                          <TodoIcon name={nextUncompletedTodo.icon} size={16} className="text-primary shrink-0" />
+                        )}
+                        <span className="font-medium truncate">{nextUncompletedTodo.text}</span>
+                        {nextUncompletedTodo.durationMinutes && (
+                          <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
+                            {nextUncompletedTodo.durationMinutes}分
+                          </span>
+                        )}
+                      </div>
+                      {nextUncompletedTodo.durationMinutes ? (
+                        <Button
+                          size="sm"
+                          onClick={() => startTask(nextUncompletedTodo.id)}
+                          className="h-7 text-xs shrink-0"
+                        >
+                          <Play className="h-3 w-3 mr-1" />
+                          開始
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => toggleTodo(nextUncompletedTodo.id)}
+                          className="h-7 text-xs shrink-0"
+                        >
+                          <Check className="h-3 w-3 mr-1" />
+                          完成
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : null}
 
               {/* Settings Card */}
               <Card>
