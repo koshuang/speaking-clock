@@ -5,6 +5,13 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.8.0](https://github.com/koshuang/speaking-clock/compare/v1.7.0...v1.8.0) (2026-01-25)
+
+
+### Features
+
+* **child-mode:** add child-friendly features for first-grade students ([32b3cce](https://github.com/koshuang/speaking-clock/commit/32b3ccef4376ae4fa6a4ea9ed00041f83d529866))
+
 ## [1.7.0](https://github.com/koshuang/speaking-clock/compare/v1.6.1...v1.7.0) (2026-01-25)
 
 
