@@ -9,8 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/presentation/components/ui/dropdown-menu'
-import { Moon, Sun, Monitor, Download, Volume2, VolumeX } from 'lucide-react'
-import { TodoForm, TodoList } from './todo'
+import { Moon, Sun, Monitor, Download, Volume2, VolumeX, Play, Pause, Check, Timer } from 'lucide-react'
+import { TodoForm, TodoList, TodoIcon } from './todo'
 import { SettingsPanel } from './settings'
 import { BottomNav, type TabId } from './layout'
 import { container } from '@/di/container'
@@ -334,32 +334,81 @@ export function App() {
 
           {/* Tab Content */}
           {activeTab === 'clock' && (
-            <Card>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    {settings.enabled ? (
-                      <Volume2 className="h-5 w-5 text-primary" />
-                    ) : (
-                      <VolumeX className="h-5 w-5 text-muted-foreground" />
-                    )}
-                    <span className="font-medium">自動報時</span>
+            <>
+              {/* Active Task */}
+              {activeTodo && activeTodo.durationMinutes && (
+                <Card className="border-primary bg-primary/5">
+                  <CardContent className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Timer className="h-4 w-4 text-primary shrink-0" />
+                        {activeTodo.icon && (
+                          <TodoIcon name={activeTodo.icon} size={16} className="text-primary shrink-0" />
+                        )}
+                        <span className="font-medium truncate">{activeTodo.text}</span>
+                      </div>
+                      <span className="text-lg font-mono font-bold text-primary tabular-nums shrink-0">
+                        {Math.floor(remainingSeconds / 60)}:{(remainingSeconds % 60).toString().padStart(2, '0')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full bg-primary transition-all duration-300"
+                          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+                        />
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={isPaused ? resumeTask : pauseTask}
+                          className="h-7 w-7"
+                        >
+                          {isPaused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={completeTask}
+                          className="h-7 w-7 text-primary"
+                        >
+                          <Check className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Settings Card */}
+              <Card>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {settings.enabled ? (
+                        <Volume2 className="h-4 w-4 text-primary" />
+                      ) : (
+                        <VolumeX className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className="text-sm font-medium">自動報時</span>
+                    </div>
+                    <Toggle
+                      pressed={settings.enabled}
+                      onPressedChange={toggleEnabled}
+                      variant="outline"
+                      aria-label={settings.enabled ? '停用報時' : '啟用報時'}
+                      className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground h-8 text-xs"
+                    >
+                      {settings.enabled ? '已啟用' : '已停用'}
+                    </Toggle>
                   </div>
-                  <Toggle
-                    pressed={settings.enabled}
-                    onPressedChange={toggleEnabled}
-                    variant="outline"
-                    aria-label={settings.enabled ? '停用報時' : '啟用報時'}
-                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                  >
-                    {settings.enabled ? '已啟用' : '已停用'}
-                  </Toggle>
-                </div>
-                <p className="text-xs text-muted-foreground text-center">
-                  點擊時鐘可立即報時 · 到「設定」調整間隔和語音
-                </p>
-              </CardContent>
-            </Card>
+                  <p className="text-[11px] text-muted-foreground text-center">
+                    點擊時鐘可立即報時 · 到「設定」調整間隔和語音
+                  </p>
+                </CardContent>
+              </Card>
+            </>
           )}
 
           {activeTab === 'todo' && (
