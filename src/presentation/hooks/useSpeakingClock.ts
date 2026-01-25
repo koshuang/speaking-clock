@@ -7,7 +7,7 @@ export interface UseSpeakingClockOptions {
 }
 
 export function useSpeakingClock(options?: UseSpeakingClockOptions) {
-  const { speakTimeUseCase, manageSettingsUseCase, speechSynthesizer } = container
+  const { speakTimeUseCase, manageSettingsUseCase, speechSynthesizer, voiceSelectorUseCase, announcementScheduler } = container
 
   const [settings, setSettings] = useState<ClockSettings>(() => manageSettingsUseCase.load())
   const [currentTime, setCurrentTime] = useState(new Date())
@@ -18,20 +18,14 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
   const timerRef = useRef<number | null>(null)
   const initialVoiceRestoredRef = useRef(false)
 
-  // 載入語音列表（只負責載入，不處理選擇邏輯）
+  // 載入語音列表
   useEffect(() => {
     const loadVoices = () => {
       const availableVoices = speechSynthesizer.getVoices()
       if (availableVoices.length === 0) return
 
-      // 排序語音列表：中文優先，然後按名稱排序
-      const sortedVoices = [...availableVoices].sort((a, b) => {
-        const aIsChinese = a.lang.includes('zh') || a.lang.includes('cmn')
-        const bIsChinese = b.lang.includes('zh') || b.lang.includes('cmn')
-        if (aIsChinese && !bIsChinese) return -1
-        if (!aIsChinese && bIsChinese) return 1
-        return a.name.localeCompare(b.name)
-      })
+      // 使用 domain use case 排序語音列表
+      const sortedVoices = voiceSelectorUseCase.sortVoices(availableVoices)
 
       // 只在語音列表實際改變時才更新 state
       setVoices((prev) => {
@@ -55,7 +49,7 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
         speechSynthesis.removeEventListener('voiceschanged', loadVoices)
       }
     }
-  }, [speechSynthesizer])
+  }, [speechSynthesizer, voiceSelectorUseCase])
 
   // 語音恢復邏輯（當語音列表載入後執行一次）
   useEffect(() => {
@@ -63,29 +57,21 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
 
     initialVoiceRestoredRef.current = true
 
-    // 如果有已保存的語音 ID，檢查是否仍然可用
-    if (settings.voiceId) {
-      const savedVoice = voices.find((v) => v.id === settings.voiceId)
-      if (savedVoice) {
-        speakTimeUseCase.setVoice(savedVoice.id)
-        return
-      }
+    // 使用 domain use case 決定要使用的語音
+    const voiceToUse = voiceSelectorUseCase.getVoiceToUse(voices, settings.voiceId)
+    if (!voiceToUse) return
+
+    // 如果使用的是已保存的語音，只需設定即可
+    if (voiceToUse.id === settings.voiceId) {
+      speakTimeUseCase.setVoice(voiceToUse.id)
+      return
     }
 
-    // 沒有已保存的語音或已保存的語音不可用，選擇預設語音
-    const taiwanVoice = voices.find(
-      (voice) => voice.lang === 'zh-TW' || voice.lang === 'zh_TW'
-    )
-    const chineseVoice = voices.find(
-      (voice) => voice.lang.includes('zh') || voice.lang.includes('cmn')
-    )
-    const defaultVoice = taiwanVoice || chineseVoice || voices[0]
-
-    // 保存預設語音選擇
-    const newSettings = manageSettingsUseCase.updateVoiceId(settings, defaultVoice.id)
+    // 否則保存新選擇的語音
+    const newSettings = manageSettingsUseCase.updateVoiceId(settings, voiceToUse.id)
     setSettings(newSettings)
-    speakTimeUseCase.setVoice(defaultVoice.id)
-  }, [voices, settings.voiceId, speakTimeUseCase, manageSettingsUseCase, settings])
+    speakTimeUseCase.setVoice(voiceToUse.id)
+  }, [voices, settings.voiceId, speakTimeUseCase, manageSettingsUseCase, settings, voiceSelectorUseCase])
 
   // 更新當前時間（每秒更新顯示）
   useEffect(() => {
@@ -107,23 +93,15 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
 
     const checkAndSpeak = () => {
       const now = new Date()
-      const seconds = now.getSeconds()
-      const minutes = now.getMinutes()
 
-      // Only speak at the start of minutes (within first 2 seconds)
-      if (seconds < 2 && minutes % settings.interval === 0) {
-        if (
-          !lastSpokenTime ||
-          now.getMinutes() !== lastSpokenTime.getMinutes() ||
-          now.getHours() !== lastSpokenTime.getHours()
-        ) {
-          setIsSpeaking(true)
-          speakTimeUseCase.execute(now, () => {
-            setIsSpeaking(false)
-            options?.onTimeSpoken?.()
-          })
-          setLastSpokenTime(now)
-        }
+      // 使用 domain use case 判斷是否應該報時
+      if (announcementScheduler.shouldTriggerAnnouncement(now, settings.interval, lastSpokenTime)) {
+        setIsSpeaking(true)
+        speakTimeUseCase.execute(now, () => {
+          setIsSpeaking(false)
+          options?.onTimeSpoken?.()
+        })
+        setLastSpokenTime(now)
       }
     }
 
@@ -143,7 +121,7 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
         clearInterval(timerRef.current)
       }
     }
-  }, [settings.enabled, settings.interval, speakTimeUseCase, lastSpokenTime, options])
+  }, [settings.enabled, settings.interval, speakTimeUseCase, lastSpokenTime, options, announcementScheduler])
 
   const updateInterval = useCallback(
     (interval: number) => {

@@ -108,6 +108,41 @@ describe('AnnouncementScheduler', () => {
     })
   })
 
+  describe('shouldTriggerAnnouncement', () => {
+    it('should return true when at interval and no last spoken time', () => {
+      const time = new Date(2024, 0, 1, 10, 30, 0)
+      expect(scheduler.shouldTriggerAnnouncement(time, 15, null)).toBe(true)
+    })
+
+    it('should return true when at interval and last spoken was different minute', () => {
+      const time = new Date(2024, 0, 1, 10, 30, 0)
+      const lastSpoken = new Date(2024, 0, 1, 10, 15, 0)
+      expect(scheduler.shouldTriggerAnnouncement(time, 15, lastSpoken)).toBe(true)
+    })
+
+    it('should return false when at interval but already spoken this minute', () => {
+      const time = new Date(2024, 0, 1, 10, 30, 1)
+      const lastSpoken = new Date(2024, 0, 1, 10, 30, 0)
+      expect(scheduler.shouldTriggerAnnouncement(time, 15, lastSpoken)).toBe(false)
+    })
+
+    it('should return false when not at interval minute', () => {
+      const time = new Date(2024, 0, 1, 10, 31, 0)
+      expect(scheduler.shouldTriggerAnnouncement(time, 15, null)).toBe(false)
+    })
+
+    it('should return false when past trigger window', () => {
+      const time = new Date(2024, 0, 1, 10, 30, 5)
+      expect(scheduler.shouldTriggerAnnouncement(time, 15, null)).toBe(false)
+    })
+
+    it('should allow announcement at same minute in different hour', () => {
+      const time = new Date(2024, 0, 1, 11, 30, 0)
+      const lastSpoken = new Date(2024, 0, 1, 10, 30, 0)
+      expect(scheduler.shouldTriggerAnnouncement(time, 15, lastSpoken)).toBe(true)
+    })
+  })
+
   describe('formatNextTime', () => {
     it('should format time in HH:MM format', () => {
       const time = new Date(2024, 0, 1, 10, 30, 0)

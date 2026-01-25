@@ -203,24 +203,6 @@ export function App() {
     }
   }
 
-  const formatDisplayTime = (date: Date) => {
-    return date.toLocaleTimeString('zh-TW', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    })
-  }
-
-  const formatDisplayDate = (date: Date) => {
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      weekday: 'long',
-    })
-  }
-
   // Count uncompleted todos for badge
   const uncompletedTodoCount = todos.filter((t) => !t.completed).length
 
@@ -296,9 +278,9 @@ export function App() {
             aria-label="點擊報時"
           >
             <CardContent className="py-0 text-center">
-              <div className="text-[11px] opacity-90">{formatDisplayDate(currentTime)}</div>
+              <div className="text-[11px] opacity-90">{container.displayTimeFormatter.formatDate(currentTime)}</div>
               <div className="font-mono text-2xl font-bold tracking-wider">
-                {formatDisplayTime(currentTime)}
+                {container.displayTimeFormatter.formatTime(currentTime)}
               </div>
               <div className="text-[10px] opacity-70">
                 {settings.enabled

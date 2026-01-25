@@ -58,6 +58,37 @@ export class AnnouncementScheduler {
   }
 
   /**
+   * Check if an announcement should trigger, considering the last spoken time
+   * Prevents duplicate announcements for the same minute
+   *
+   * @param currentTime - Current time
+   * @param intervalMinutes - Interval between announcements
+   * @param lastSpokenTime - Last time an announcement was made (optional)
+   * @returns true if announcement should trigger now
+   */
+  shouldTriggerAnnouncement(
+    currentTime: Date,
+    intervalMinutes: number,
+    lastSpokenTime?: Date | null
+  ): boolean {
+    // First check if we're at an announcement time
+    if (!this.shouldAnnounce(currentTime, intervalMinutes)) {
+      return false
+    }
+
+    // Check if we already announced for this minute
+    if (lastSpokenTime) {
+      const sameMinute = currentTime.getMinutes() === lastSpokenTime.getMinutes()
+      const sameHour = currentTime.getHours() === lastSpokenTime.getHours()
+      if (sameMinute && sameHour) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  /**
    * Format the next announcement time as a string (HH:MM)
    *
    * @param nextTime - Next announcement time
