@@ -52,7 +52,11 @@ speaking-clock/
 │   ├── infrastructure/        # 外部依賴實作（Web Speech API、localStorage）
 │   ├── presentation/          # UI 層 (React)
 │   │   ├── hooks/             # React Hooks（報時控制、螢幕鎖定、待辦管理）
-│   │   └── components/        # React 元件（時鐘、控制面板、待辦清單）
+│   │   └── components/        # React 元件
+│   │       ├── ui/            # shadcn/ui 基礎元件
+│   │       ├── todo/          # 待辦清單相關元件
+│   │       ├── settings/      # 設定面板元件
+│   │       └── layout/        # 佈局元件（底部導航）
 │   └── di/                    # 依賴注入容器
 │
 ├── docs/

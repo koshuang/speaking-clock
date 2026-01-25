@@ -2,48 +2,17 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSpeakingClock, useWakeLock, useTodos, useActiveTask } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
-import { Toggle } from '@/presentation/components/ui/toggle'
-import { ToggleGroup, ToggleGroupItem } from '@/presentation/components/ui/toggle-group'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/presentation/components/ui/select'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/presentation/components/ui/dropdown-menu'
-import { Moon, Sun, Monitor, Download, Check, ListTodo } from 'lucide-react'
-import type { Voice } from '@/domain/entities/Voice'
+import { Moon, Sun, Monitor, Download } from 'lucide-react'
 import { TodoForm, TodoList } from './todo'
+import { SettingsPanel } from './settings'
+import { BottomNav, type TabId } from './layout'
 import { container } from '@/di/container'
-
-const INTERVAL_OPTIONS = [1, 5, 10, 15, 30, 60]
-
-const formatVoiceName = (voice: Voice): string => {
-  const langMap: Record<string, string> = {
-    'zh-TW': '台灣',
-    'zh_TW': '台灣',
-    'zh-CN': '中國',
-    'zh_CN': '中國',
-    'zh-HK': '香港',
-    'zh_HK': '香港',
-  }
-
-  // Clean up name by removing provider prefixes
-  let displayName = voice.name
-    .replace(/^(Google|Microsoft|Apple)\s+/i, '')
-    .replace(/^(Chinese|Mandarin|Cantonese)\s+/i, '')
-
-  // Get friendly language label
-  const langLabel = langMap[voice.lang] || voice.lang
-
-  return `${displayName} (${langLabel})`
-}
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -51,6 +20,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function App() {
+  const [activeTab, setActiveTab] = useState<TabId>('clock')
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>(() => {
     const saved = localStorage.getItem('theme')
     return (saved as 'light' | 'dark' | 'system') || 'system'
@@ -251,7 +221,6 @@ export function App() {
       next.setHours(next.getHours() + 1)
       next.setMinutes(nextMinute - 60)
     } else if (nextMinute === minutes && minutes % interval === 0) {
-      // If we're exactly on an interval minute, show next one
       next.setMinutes(minutes + interval)
       if (next.getMinutes() >= 60) {
         next.setHours(next.getHours() + 1)
@@ -269,13 +238,16 @@ export function App() {
     })
   }
 
+  // Count uncompleted todos for badge
+  const uncompletedTodoCount = todos.filter((t) => !t.completed).length
+
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="mx-auto max-w-md space-y-6">
-        {/* Header */}
-        <header className="flex items-center justify-between pt-4">
+    <div className="flex min-h-screen flex-col bg-background">
+      {/* Fixed Header */}
+      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">
           <div className="flex-1" />
-          <h1 className="flex-1 text-center text-2xl font-bold text-primary">語音報時器</h1>
+          <h1 className="flex-1 text-center text-xl font-bold text-primary">語音報時器</h1>
           <div className="flex flex-1 justify-end">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -305,200 +277,144 @@ export function App() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Install Prompt */}
-        {showInstallButton && (
-          <Card className="bg-primary/10 border-primary/20">
-            <CardContent className="flex items-center justify-between py-3">
-              <span className="text-sm">安裝到主畫面以獲得最佳體驗</span>
-              <Button size="sm" onClick={handleInstall}>
-                <Download className="mr-2 h-4 w-4" />
-                安裝
-              </Button>
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto pb-20">
+        <div className="mx-auto max-w-md space-y-4 p-4">
+          {/* Install Prompt */}
+          {showInstallButton && (
+            <Card className="border-primary/20 bg-primary/10">
+              <CardContent className="flex items-center justify-between py-3">
+                <span className="text-sm">安裝到主畫面以獲得最佳體驗</span>
+                <Button size="sm" onClick={handleInstall}>
+                  <Download className="mr-2 h-4 w-4" />
+                  安裝
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Clock Display - Always visible */}
+          <Card
+            className={`cursor-pointer bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-shadow hover:shadow-lg active:scale-[0.99] ${isSpeaking ? 'animate-pulse ring-4 ring-primary/50' : ''}`}
+            onClick={speakNow}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                speakNow()
+              }
+            }}
+            aria-label="點擊報時"
+          >
+            <CardContent className="py-6 text-center">
+              <div className="text-sm opacity-90">{formatDisplayDate(currentTime)}</div>
+              <div className="mt-2 font-mono text-4xl font-bold tracking-wider">
+                {formatDisplayTime(currentTime)}
+              </div>
+              <div className="mt-2 text-xs opacity-70">
+                {settings.enabled
+                  ? `下次報時：${getNextAnnouncementTime(currentTime, settings.interval)}`
+                  : '報時已停用'}
+              </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Clock Display */}
-        <Card
-          className={`bg-gradient-to-br from-primary to-primary/80 text-primary-foreground cursor-pointer hover:shadow-lg transition-shadow active:scale-[0.99] ${isSpeaking ? 'animate-pulse ring-4 ring-primary/50' : ''}`}
-          onClick={speakNow}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              speakNow()
-            }
-          }}
-          aria-label="點擊報時"
-        >
-          <CardContent className="py-8 text-center">
-            <div className="text-sm opacity-90">{formatDisplayDate(currentTime)}</div>
-            <div className="mt-2 font-mono text-5xl font-bold tracking-wider">
-              {formatDisplayTime(currentTime)}
-            </div>
-            <div className="mt-2 text-xs opacity-70">點擊可報時</div>
-          </CardContent>
-        </Card>
-
-        {/* Controls */}
-        <Card>
-          <CardContent className="space-y-6">
-            {/* Announcement Toggle */}
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">報時狀態</span>
-              <Toggle
-                pressed={settings.enabled}
-                onPressedChange={toggleEnabled}
-                variant="outline"
-                aria-label={settings.enabled ? '停用報時' : '啟用報時'}
-                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-              >
-                {settings.enabled ? '已啟用' : '已停用'}
-              </Toggle>
-            </div>
-
-            {/* Wake Lock Toggle */}
-            {wakeLockSupported && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">螢幕常亮</span>
-                  <Toggle
-                    pressed={wakeLockActive}
-                    onPressedChange={toggleWakeLock}
-                    variant="outline"
-                    aria-label={wakeLockActive ? '關閉螢幕常亮' : '開啟螢幕常亮'}
-                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                  >
-                    {wakeLockActive ? '已開啟' : '已關閉'}
-                  </Toggle>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  開啟後螢幕不會自動關閉，確保報時正常運作
+          {/* Tab Content */}
+          {activeTab === 'clock' && (
+            <Card>
+              <CardContent className="py-4 text-center text-muted-foreground">
+                <p className="text-sm">點擊上方時鐘可立即報時</p>
+                <p className="mt-2 text-xs">
+                  切換到「待辦」新增提醒事項，或到「設定」調整報時間隔
                 </p>
-              </div>
-            )}
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Interval Selection */}
-            <div className="space-y-2">
-              <span className="text-sm font-medium">報時間隔</span>
-              <ToggleGroup
-                type="single"
-                value={String(settings.interval)}
-                onValueChange={(value) => value && updateInterval(Number(value))}
-                variant="outline"
-                aria-label="選擇報時間隔"
-                className="flex flex-wrap justify-start gap-2"
-              >
-                {INTERVAL_OPTIONS.map((interval) => (
-                  <ToggleGroupItem
-                    key={interval}
-                    value={String(interval)}
-                    aria-label={`每 ${interval} 分鐘報時`}
-                    className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground gap-1"
-                  >
-                    {settings.interval === interval && <Check className="h-4 w-4" />}
-                    {interval} 分鐘
-                  </ToggleGroupItem>
-                ))}
-              </ToggleGroup>
-            </div>
+          {activeTab === 'todo' && (
+            <Card className={isSpeakingReminder ? 'animate-pulse ring-2 ring-primary' : ''}>
+              <CardContent className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold">待辦提醒</h2>
+                  <p className="text-xs text-muted-foreground">
+                    報時後會語音提醒下一個待辦事項
+                  </p>
+                </div>
+                <TodoForm onAdd={addTodo} />
+                <TodoList
+                  todos={todos}
+                  nextTodoId={nextUncompletedTodo?.id ?? null}
+                  activeTodoId={activeTodo?.id ?? null}
+                  remainingSeconds={remainingSeconds}
+                  progress={progress}
+                  isPaused={isPaused}
+                  onToggle={toggleTodo}
+                  onUpdate={updateTodo}
+                  onRemove={removeTodo}
+                  onReorder={reorderTodos}
+                  onStartTask={startTask}
+                  onPauseTask={pauseTask}
+                  onResumeTask={resumeTask}
+                  onCompleteTask={completeTask}
+                />
+              </CardContent>
+            </Card>
+          )}
 
-            {/* Voice Selection */}
-            <div className="space-y-2">
-              <span className="text-sm font-medium">語音選擇</span>
-              <Select value={selectedVoiceId || ''} onValueChange={handleVoiceChange} aria-label="選擇語音" disabled={voicesLoading}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={voicesLoading ? "載入語音中..." : "選擇語音"} />
-                </SelectTrigger>
-                <SelectContent position="popper" className="max-h-60">
-                  {voices.length === 0 ? (
-                    <SelectItem value="none" disabled>
-                      {voicesLoading ? "載入中..." : "無可用語音"}
-                    </SelectItem>
-                  ) : (
-                    voices.map((voice) => (
-                      <SelectItem key={voice.id} value={voice.id}>
-                        {formatVoiceName(voice)}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+          {activeTab === 'settings' && (
+            <Card>
+              <CardContent>
+                <SettingsPanel
+                  settings={settings}
+                  voices={voices}
+                  voicesLoading={voicesLoading}
+                  selectedVoiceId={selectedVoiceId}
+                  wakeLockSupported={wakeLockSupported}
+                  wakeLockActive={wakeLockActive}
+                  onToggleEnabled={toggleEnabled}
+                  onUpdateInterval={updateInterval}
+                  onVoiceChange={handleVoiceChange}
+                  onToggleWakeLock={toggleWakeLock}
+                  onSpeakNow={speakNow}
+                />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </main>
 
-            {/* Speak Now Button */}
-            <Button onClick={speakNow} className="w-full" size="lg" aria-label="立即報時">
-              立即報時
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Todo Section */}
-        <Card className={isSpeakingReminder ? 'ring-2 ring-primary animate-pulse' : ''}>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-2">
-              <ListTodo className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold">待辦提醒</h2>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              報時後會語音提醒下一個待辦事項
-            </p>
-            <TodoForm onAdd={addTodo} />
-            <TodoList
-              todos={todos}
-              nextTodoId={nextUncompletedTodo?.id ?? null}
-              activeTodoId={activeTodo?.id ?? null}
-              remainingSeconds={remainingSeconds}
-              progress={progress}
-              isPaused={isPaused}
-              onToggle={toggleTodo}
-              onUpdate={updateTodo}
-              onRemove={removeTodo}
-              onReorder={reorderTodos}
-              onStartTask={startTask}
-              onPauseTask={pauseTask}
-              onResumeTask={resumeTask}
-              onCompleteTask={completeTask}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Status Footer */}
-        <footer className="pb-4 text-center">
-          <p className="text-sm text-muted-foreground">
-            {settings.enabled
-              ? `下次報時：${getNextAnnouncementTime(currentTime, settings.interval)}`
-              : '報時已停用'}
-          </p>
-        </footer>
-      </div>
+      {/* Bottom Navigation */}
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} todoCount={uncompletedTodoCount} />
 
       {/* Onboarding Overlay */}
       {showOnboarding && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <Card className="max-w-sm w-full">
-            <CardContent className="py-6 space-y-4">
-              <h2 className="text-xl font-bold text-center">歡迎使用語音報時器</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <Card className="w-full max-w-sm">
+            <CardContent className="space-y-4 py-6">
+              <h2 className="text-center text-xl font-bold">歡迎使用語音報時器</h2>
 
               <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-3">
-                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">1</span>
-                  <p>點擊「報時狀態」啟用自動報時功能</p>
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    1
+                  </span>
+                  <p>點擊下方「設定」調整報時間隔和語音</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">2</span>
-                  <p>選擇報時間隔（如每 15 分鐘）</p>
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    2
+                  </span>
+                  <p>點擊「待辦」新增待辦事項，報時時會自動提醒</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">3</span>
-                  <p>選擇喜歡的語音</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <span className="bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">4</span>
-                  <p>點擊時鐘或「立即報時」按鈕可隨時報時</p>
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    3
+                  </span>
+                  <p>點擊時鐘可隨時立即報時</p>
                 </div>
               </div>
 
