@@ -5,6 +5,18 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.9.0](https://github.com/koshuang/speaking-clock/compare/v1.8.0...v1.9.0) (2026-01-25)
+
+
+### Features
+
+* **child-mode:** add protagonist name and adjust speech rate ([e496fad](https://github.com/koshuang/speaking-clock/commit/e496fad72eb56a39c513a2e1ead7aabe3903731b))
+
+
+### Documentation
+
+* Add new persona documents and update README/PRD ([dfe9042](https://github.com/koshuang/speaking-clock/commit/dfe9042eee6d0a68c6d346adaf9a571a8ffc321e))
+
 ## [1.8.0](https://github.com/koshuang/speaking-clock/compare/v1.7.0...v1.8.0) (2026-01-25)
 
 
