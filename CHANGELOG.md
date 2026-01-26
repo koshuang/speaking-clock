@@ -5,6 +5,13 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.10.0](https://github.com/koshuang/speaking-clock/compare/v1.9.0...v1.10.0) (2026-01-26)
+
+
+### Features
+
+* add Google Analytics tracking ([e15c74c](https://github.com/koshuang/speaking-clock/commit/e15c74caa7da4a41aea66885151f2b9050249446))
+
 ## [1.9.0](https://github.com/koshuang/speaking-clock/compare/v1.8.0...v1.9.0) (2026-01-25)
 
 
