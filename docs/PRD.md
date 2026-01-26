@@ -160,6 +160,7 @@ src/
 | 拖曳排序 | dnd-kit | 無障礙拖曳排序套件 |
 | 樣式 | Tailwind CSS v4 | Utility-first CSS 框架 |
 | PWA | vite-plugin-pwa | Service Worker 與 Manifest |
+| 分析/Analytics | Google Analytics (gtag.js) | 使用者行為追蹤 |
 | 測試 | Vitest | 單元測試 |
 | 部署 | GitHub Pages | 靜態網站託管 |
 

@@ -70,6 +70,7 @@ src/
 | 拖曳排序 | dnd-kit |
 | 樣式 | Tailwind CSS v4 |
 | PWA | vite-plugin-pwa |
+| 分析/Analytics | Google Analytics (gtag.js) |
 | 測試 | Vitest |
 | 部署 | GitHub Pages + GitHub Actions |
 
