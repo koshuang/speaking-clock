@@ -14,6 +14,7 @@ import {
   TaskTemplateUseCase,
   CompletionFeedbackUseCase,
   ChildModeSettingsUseCase,
+  ManageStarRewardsUseCase,
 } from '../domain/usecases'
 import {
   WebSpeechSynthesizer,
@@ -21,6 +22,7 @@ import {
   LocalStorageTodoRepository,
   ScreenWakeLockManager,
   SoundEffectPlayer,
+  LocalStorageStarRewardsRepository,
 } from '../infrastructure'
 import { SessionStorageActiveTaskStateRepository } from '../infrastructure/repositories/ActiveTaskStateRepository'
 
@@ -31,6 +33,7 @@ const todoRepository = new LocalStorageTodoRepository()
 const wakeLockManager = new ScreenWakeLockManager()
 const activeTaskStateRepository = new SessionStorageActiveTaskStateRepository()
 const soundEffectPlayer = new SoundEffectPlayer()
+const starRewardsRepository = new LocalStorageStarRewardsRepository()
 
 // Use case instances
 const speakTimeUseCase = new SpeakTimeUseCase(speechSynthesizer)
@@ -48,6 +51,7 @@ const postAnnouncementUseCase = new PostAnnouncementUseCase(taskReminderTextGene
 const taskTemplateUseCase = new TaskTemplateUseCase()
 const completionFeedbackUseCase = new CompletionFeedbackUseCase()
 const childModeSettingsUseCase = new ChildModeSettingsUseCase()
+const manageStarRewardsUseCase = new ManageStarRewardsUseCase(starRewardsRepository)
 
 export const container = {
   speechSynthesizer,
@@ -71,4 +75,6 @@ export const container = {
   taskTemplateUseCase,
   completionFeedbackUseCase,
   childModeSettingsUseCase,
+  starRewardsRepository,
+  manageStarRewardsUseCase,
 }

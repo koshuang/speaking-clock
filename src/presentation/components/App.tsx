@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useSpeakingClock, useWakeLock, useTodos, useActiveTask } from '../hooks'
+import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
 import { Toggle } from '@/presentation/components/ui/toggle'
@@ -14,6 +14,8 @@ import { TodoForm, TodoList, TodoIcon } from './todo'
 import { SettingsPanel } from './settings'
 import { BottomNav, type TabId } from './layout'
 import { CelebrationAnimation } from './feedback/CelebrationAnimation'
+import { StarRewardAnimation } from './feedback/StarRewardAnimation'
+import { StarCounter, DailyProgressRing } from './progress'
 import { container } from '@/di/container'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -31,6 +33,7 @@ export function App() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
+  const [showStarReward, setShowStarReward] = useState(false)
 
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('onboarding-completed')
@@ -52,6 +55,15 @@ export function App() {
     setVoice: setTodoVoice,
     speakReminder,
   } = useTodos()
+
+  const {
+    todayStars,
+    dailyGoal,
+    lastEarned,
+    addStars,
+    addDailyBonus,
+    clearLastEarned,
+  } = useStarRewards()
 
   // Use refs to store values needed in handleTimeSpoken callback
   const activeTaskDataRef = useRef<{
@@ -151,6 +163,18 @@ export function App() {
       toggleTodo(activeTodo.id)
     }
 
+    // Add star rewards - check if completed on time (remaining time > 0)
+    const isOnTime = remainingSeconds > 0
+    addStars(isOnTime)
+    setShowStarReward(true)
+
+    // Check if all tasks completed for daily bonus
+    const completedCount = todos.filter(t => t.completed).length + 1
+    const totalCount = todos.length
+    if (completedCount === totalCount && totalCount > 0) {
+      addDailyBonus()
+    }
+
     // Child mode celebration
     if (settings.childMode) {
       setShowCelebration(true)
@@ -161,7 +185,7 @@ export function App() {
     }
 
     completeTask()
-  }, [activeTodo, toggleTodo, completeTask, settings.childMode, selectedVoiceId])
+  }, [activeTodo, toggleTodo, completeTask, settings.childMode, selectedVoiceId, remainingSeconds, addStars, addDailyBonus, todos])
 
   const {
     isSupported: wakeLockSupported,
@@ -247,7 +271,8 @@ export function App() {
           <h1 className="flex-1 text-center text-xl font-bold text-primary whitespace-nowrap">
             語音報時器<sup className="ml-1.5 text-[10px] font-normal text-muted-foreground">v{__APP_VERSION__}</sup>
           </h1>
-          <div className="flex flex-1 justify-end">
+          <div className="flex flex-1 items-center justify-end gap-2">
+            <StarCounter count={todayStars} animate={showStarReward} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="切換主題">
@@ -437,6 +462,20 @@ export function App() {
                   </p>
                 </CardContent>
               </Card>
+
+              {/* Daily Progress Ring */}
+              {todos.length > 0 && (
+                <Card>
+                  <CardContent className="py-4">
+                    <DailyProgressRing
+                      completedTasks={todos.filter(t => t.completed).length}
+                      totalTasks={todos.length}
+                      todayStars={todayStars}
+                      dailyGoal={dailyGoal}
+                    />
+                  </CardContent>
+                </Card>
+              )}
             </>
           )}
 
@@ -535,6 +574,17 @@ export function App() {
 
       {/* Celebration Animation */}
       <CelebrationAnimation show={showCelebration} onComplete={() => setShowCelebration(false)} />
+
+      {/* Star Reward Animation */}
+      <StarRewardAnimation
+        show={showStarReward}
+        stars={lastEarned?.stars ?? 0}
+        hasComboBonus={lastEarned?.hasComboBonus ?? false}
+        onComplete={() => {
+          setShowStarReward(false)
+          clearLastEarned()
+        }}
+      />
     </div>
   )
 }

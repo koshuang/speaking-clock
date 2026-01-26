@@ -51,12 +51,14 @@ speaking-clock/
 │   │   └── ports/             # 介面定義（語音合成、儲存庫、螢幕鎖定）
 │   ├── infrastructure/        # 外部依賴實作（Web Speech API、localStorage）
 │   ├── presentation/          # UI 層 (React)
-│   │   ├── hooks/             # React Hooks（報時控制、螢幕鎖定、待辦管理）
+│   │   ├── hooks/             # React Hooks（報時控制、螢幕鎖定、待辦管理、星星獎勵）
 │   │   └── components/        # React 元件
 │   │       ├── ui/            # shadcn/ui 基礎元件
 │   │       ├── todo/          # 待辦清單相關元件
 │   │       ├── settings/      # 設定面板元件
-│   │       └── layout/        # 佈局元件（底部導航）
+│   │       ├── layout/        # 佈局元件（底部導航）
+│   │       ├── feedback/      # 回饋動畫元件（慶祝、星星獎勵）
+│   │       └── progress/      # 進度顯示元件（星星計數器、每日進度環）
 │   └── di/                    # 依賴注入容器
 │
 ├── docs/
