@@ -5,6 +5,13 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.11.0](https://github.com/koshuang/speaking-clock/compare/v1.10.0...v1.11.0) (2026-01-28)
+
+
+### Features
+
+* **gamification:** add star rewards system ([c547287](https://github.com/koshuang/speaking-clock/commit/c547287148cd927f7eb54af689bc598f7da0a4e3))
+
 ## [1.10.0](https://github.com/koshuang/speaking-clock/compare/v1.9.0...v1.10.0) (2026-01-26)
 
 
