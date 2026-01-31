@@ -6,3 +6,11 @@ export { SessionStorageActiveTaskStateRepository } from './repositories/ActiveTa
 export type { ActiveTaskStateRepository } from './repositories/ActiveTaskStateRepository'
 export { SoundEffectPlayer } from './SoundEffectPlayer'
 export { LocalStorageStarRewardsRepository } from './LocalStorageStarRewardsRepository'
+export {
+  supabase,
+  isSupabaseConfigured,
+  SupabaseAuthRepository,
+  SupabaseSyncSettingsRepository,
+  SupabaseSyncTodoRepository,
+  SupabaseSyncStarRewardsRepository,
+} from './supabase'

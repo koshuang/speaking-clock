@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards } from '../hooks'
+import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards, useAuth } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
 import { Toggle } from '@/presentation/components/ui/toggle'
@@ -16,6 +16,7 @@ import { BottomNav, type TabId } from './layout'
 import { CelebrationAnimation } from './feedback/CelebrationAnimation'
 import { StarRewardAnimation } from './feedback/StarRewardAnimation'
 import { StarCounter, DailyProgressRing } from './progress'
+import { LoginDialog, UserMenu, LoginButton } from './auth'
 import { container } from '@/di/container'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -34,6 +35,9 @@ export function App() {
   const [showInstallButton, setShowInstallButton] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
   const [showStarReward, setShowStarReward] = useState(false)
+  const [showLoginDialog, setShowLoginDialog] = useState(false)
+
+  const { isAuthenticated, isConfigured: isAuthConfigured } = useAuth()
 
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('onboarding-completed')
@@ -273,6 +277,13 @@ export function App() {
           </h1>
           <div className="flex flex-1 items-center justify-end gap-2">
             <StarCounter count={todayStars} animate={showStarReward} />
+            {isAuthConfigured && (
+              isAuthenticated ? (
+                <UserMenu />
+              ) : (
+                <LoginButton onClick={() => setShowLoginDialog(true)} />
+              )
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="切換主題">
@@ -585,6 +596,9 @@ export function App() {
           clearLastEarned()
         }}
       />
+
+      {/* Login Dialog */}
+      <LoginDialog open={showLoginDialog} onClose={() => setShowLoginDialog(false)} />
     </div>
   )
 }

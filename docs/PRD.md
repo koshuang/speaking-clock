@@ -127,6 +127,17 @@
 | 資料持久化 | 使用 localStorage 儲存星星紀錄 | P0 ✅ |
 | 每日重置 | 跨日自動重置今日星星，保留歷史紀錄 | P1 ✅ |
 
+#### 2.1.11 雲端同步與認證（v1.11.0 新增）
+| 需求 | 描述 | 優先級 |
+|------|------|--------|
+| Google 登入 | 支援 Google OAuth 一鍵登入 | P1 ✅ |
+| Email 登入 | 支援 Email/Password 註冊與登入 | P1 ✅ |
+| 設定同步 | 登入後自動同步報時設定到雲端 | P1 ✅ |
+| 待辦同步 | 登入後自動同步待辦清單到雲端 | P1 ✅ |
+| 星星同步 | 登入後自動同步星星獎勵到雲端 | P1 ✅ |
+| 離線優先 | localStorage 優先，背景同步到雲端 | P1 ✅ |
+| 使用者選單 | 顯示使用者頭像與名稱，提供登出功能 | P1 ✅ |
+
 **星星獎勵規則：**
 | 條件 | 獲得星星 |
 |------|---------|
@@ -182,6 +193,7 @@ src/
 | 樣式 | Tailwind CSS v4 | Utility-first CSS 框架 |
 | PWA | vite-plugin-pwa | Service Worker 與 Manifest |
 | 分析/Analytics | Google Analytics (gtag.js) | 使用者行為追蹤 |
+| 認證/同步 | Supabase | 雲端認證與資料同步 |
 | 測試 | Vitest | 單元測試 |
 | 部署 | GitHub Pages | 靜態網站託管 |
 
@@ -194,6 +206,7 @@ src/
 | Web Audio API | 播放慶祝音效 | 現代瀏覽器皆支援 |
 | localStorage | 儲存設定與待辦 | 所有瀏覽器 |
 | sessionStorage | 儲存進行中任務狀態 | 所有瀏覽器 |
+| Supabase | 雲端認證與資料同步 | N/A (後端服務) |
 
 ## 4. 使用者介面
 

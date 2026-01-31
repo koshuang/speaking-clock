@@ -23,8 +23,15 @@ import {
   ScreenWakeLockManager,
   SoundEffectPlayer,
   LocalStorageStarRewardsRepository,
+  SupabaseAuthRepository,
+  SupabaseSyncSettingsRepository,
+  SupabaseSyncTodoRepository,
+  SupabaseSyncStarRewardsRepository,
 } from '../infrastructure'
 import { SessionStorageActiveTaskStateRepository } from '../infrastructure/repositories/ActiveTaskStateRepository'
+import type { SettingsRepository } from '../domain/ports/SettingsRepository'
+import type { TodoRepository } from '../domain/ports/TodoRepository'
+import type { StarRewardsRepository } from '../domain/ports/StarRewardsRepository'
 
 // Infrastructure instances
 const speechSynthesizer = new WebSpeechSynthesizer()
@@ -34,6 +41,20 @@ const wakeLockManager = new ScreenWakeLockManager()
 const activeTaskStateRepository = new SessionStorageActiveTaskStateRepository()
 const soundEffectPlayer = new SoundEffectPlayer()
 const starRewardsRepository = new LocalStorageStarRewardsRepository()
+const authRepository = new SupabaseAuthRepository()
+
+// Factory functions for authenticated repositories
+export function createSyncSettingsRepository(userId: string): SettingsRepository {
+  return new SupabaseSyncSettingsRepository(userId)
+}
+
+export function createSyncTodoRepository(userId: string): TodoRepository {
+  return new SupabaseSyncTodoRepository(userId)
+}
+
+export function createSyncStarRewardsRepository(userId: string): StarRewardsRepository {
+  return new SupabaseSyncStarRewardsRepository(userId)
+}
 
 // Use case instances
 const speakTimeUseCase = new SpeakTimeUseCase(speechSynthesizer)
@@ -77,4 +98,5 @@ export const container = {
   childModeSettingsUseCase,
   starRewardsRepository,
   manageStarRewardsUseCase,
+  authRepository,
 }

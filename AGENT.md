@@ -50,16 +50,28 @@ speaking-clock/
 │   │   ├── usecases/          # 應用邏輯（報時、設定管理、待辦管理、語音提醒、任務計時、報時排程）
 │   │   └── ports/             # 介面定義（語音合成、儲存庫、螢幕鎖定）
 │   ├── infrastructure/        # 外部依賴實作（Web Speech API、localStorage）
+│   │   └── supabase/          # Supabase 認證與資料同步
+│   │       ├── client.ts      # Supabase client 初始化
+│   │       ├── SupabaseAuthRepository.ts      # 認證實作
+│   │       └── SupabaseSync*Repository.ts     # 資料同步實作
 │   ├── presentation/          # UI 層 (React)
-│   │   ├── hooks/             # React Hooks（報時控制、螢幕鎖定、待辦管理、星星獎勵）
+│   │   ├── contexts/          # React Context
+│   │   │   └── AuthContext.tsx  # 認證狀態管理
+│   │   ├── hooks/             # React Hooks（報時控制、螢幕鎖定、待辦管理、星星獎勵、認證）
 │   │   └── components/        # React 元件
 │   │       ├── ui/            # shadcn/ui 基礎元件
+│   │       ├── auth/          # 認證相關元件（LoginDialog、UserMenu）
 │   │       ├── todo/          # 待辦清單相關元件
 │   │       ├── settings/      # 設定面板元件
 │   │       ├── layout/        # 佈局元件（底部導航）
 │   │       ├── feedback/      # 回饋動畫元件（慶祝、星星獎勵）
 │   │       └── progress/      # 進度顯示元件（星星計數器、每日進度環）
 │   └── di/                    # 依賴注入容器
+│
+├── supabase/
+│   ├── migrations/            # Supabase SQL migrations
+│   │   └── 001_initial_auth_tables.sql
+│   └── README.md              # Migration 使用說明
 │
 ├── docs/
 │   ├── PRD.md                 # 產品需求文件
@@ -330,3 +342,33 @@ npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
 - `TodoItem.tsx` - useSortable hook 使用範例
 
 查看所有可用元件：https://ui.shadcn.com/docs/components
+
+### Supabase 雲端同步
+
+專案使用 Supabase 提供認證與資料同步功能：
+
+**環境變數設定：**
+```bash
+# 複製範本
+cp .env.example .env.local
+
+# 填入 Supabase credentials
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-publishable-key
+```
+
+**資料庫 Migration：**
+```bash
+# 在 Supabase SQL Editor 執行
+supabase/migrations/001_initial_auth_tables.sql
+```
+
+**同步架構：**
+- 離線優先：localStorage 作為主要儲存
+- 背景同步：登入後自動同步到 Supabase
+- Hybrid Storage：SupabaseSync*Repository 類別處理雙向同步
+
+**新增 Migration：**
+1. 在 `supabase/migrations/` 新增 SQL 檔案
+2. 命名格式：`{序號}_{描述}.sql`
+3. 更新 `supabase/README.md` 的 Migration 紀錄

@@ -12,6 +12,7 @@
 - **兒童模式** - 大按鈕、慢速語音、主人公名字（提醒時先念名字），適合小朋友使用
 - **正向回饋** - 任務完成時播放慶祝音效、紙屑動畫、中文鼓勵語
 - **星星獎勵** - 完成任務獲得星星、準時完成加分、連擊獎勵、每日進度環
+- **雲端同步** - 支援 Google/Email 登入，跨裝置同步設定與資料
 - **快速任務模板** - 22 種預設常用任務（日常、學習、自我照顧、遊戲）
 - **深色模式** - 支援淺色/深色/系統主題
 - **PWA 支援** - 可安裝到桌面或手機，支援離線使用
@@ -54,8 +55,12 @@ npm run init-prd    # 初始化 PRD 工作檔案
 ```
 src/
 ├── domain/           # 核心業務邏輯（無外部依賴）
-├── infrastructure/   # 外部依賴實作（瀏覽器 API）
+├── infrastructure/   # 外部依賴實作（瀏覽器 API、Supabase）
+│   └── supabase/     # Supabase 認證與同步
 ├── presentation/     # UI 層（React 元件）
+│   ├── components/   # React 元件
+│   ├── contexts/     # React Context（Auth）
+│   └── hooks/        # React Hooks
 └── di/               # 依賴注入
 ```
 
@@ -72,6 +77,7 @@ src/
 | 樣式 | Tailwind CSS v4 |
 | PWA | vite-plugin-pwa |
 | 分析/Analytics | Google Analytics (gtag.js) |
+| 認證/同步 | Supabase (Auth + Database) |
 | 測試 | Vitest |
 | 部署 | GitHub Pages + GitHub Actions |
 
@@ -84,6 +90,7 @@ src/
 | [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) | 播放慶祝音效 |
 | [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) | 儲存設定與待辦 |
 | [sessionStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) | 儲存進行中任務狀態 |
+| [Supabase](https://supabase.com/) | 雲端認證與資料同步 |
 
 ## 部署
 
@@ -104,6 +111,7 @@ npm run build
 | [PRD](./docs/PRD.md) | 產品需求文件 |
 | [UI/UX 設計指南](./docs/UI-UX-DESIGN-GUIDE.md) | 設計規範與元件指南 |
 | [Persona 文件](./docs/personas/) | 目標用戶角色描述 |
+| [Supabase 設定指南](./docs/SUPABASE-SETUP.md) | 雲端同步功能設定 |
 
 ## 授權
 
