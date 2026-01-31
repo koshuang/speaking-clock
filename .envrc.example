@@ -1,4 +1,11 @@
-# GitHub Token for this project
-# Required scopes: repo, project
-# Create at: https://github.com/settings/tokens/new
+# 複製此檔案為 .envrc 並填入實際值
+# cp .envrc.example .envrc && direnv allow
+
+# GitHub Token (用於 branch protection 設定)
+# 建立: https://github.com/settings/tokens/new
+# 權限: repo
 export GH_TOKEN="ghp_your_token_here"
+
+# Supabase (選用，雲端同步功能)
+# export VITE_SUPABASE_URL="https://your-project.supabase.co"
+# export VITE_SUPABASE_ANON_KEY="your_anon_key"

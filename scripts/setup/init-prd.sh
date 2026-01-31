@@ -5,7 +5,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+PROJECT_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 TEMPLATE="$PROJECT_ROOT/docs/templates/PRD-TEMPLATE.md"
 OMC_DIR="$PROJECT_ROOT/.omc"
 PRD_FILE="$OMC_DIR/prd.md"

@@ -24,7 +24,7 @@ export function UserMenu() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-8 w-8 rounded-full"
+          className="relative h-8 w-8 rounded-full overflow-hidden"
           aria-label="使用者選單"
         >
           {user.avatarUrl ? (

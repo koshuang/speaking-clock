@@ -112,6 +112,7 @@ npm run build
 | [UI/UX 設計指南](./docs/UI-UX-DESIGN-GUIDE.md) | 設計規範與元件指南 |
 | [Persona 文件](./docs/personas/) | 目標用戶角色描述 |
 | [Supabase 設定指南](./docs/SUPABASE-SETUP.md) | 雲端同步功能設定 |
+| [CI/CD 設定指南](./docs/CI-CD-SETUP.md) | GitHub Actions 與 Renovate 設定 |
 
 ## 授權
 
