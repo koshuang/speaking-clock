@@ -113,6 +113,7 @@ npm run build
 | [Persona 文件](./docs/personas/) | 目標用戶角色描述 |
 | [Supabase 設定指南](./docs/SUPABASE-SETUP.md) | 雲端同步功能設定 |
 | [CI/CD 設定指南](./docs/CI-CD-SETUP.md) | GitHub Actions 與 Renovate 設定 |
+| [AI 輔助開發指南](./docs/AI-ASSISTED-DEVELOPMENT.md) | 如何善用 AI 協作開發 |
 
 ## 授權
 
