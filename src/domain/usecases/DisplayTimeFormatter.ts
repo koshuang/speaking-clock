@@ -15,6 +15,7 @@ export class DisplayTimeFormatter {
       minute: '2-digit',
       second: '2-digit',
       hour12: false,
+      hourCycle: 'h23', // Force 0-23 format (midnight = 00:00, not 24:00)
     })
   }
 
@@ -44,6 +45,7 @@ export class DisplayTimeFormatter {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
+      hourCycle: 'h23', // Force 0-23 format (midnight = 00:00, not 24:00)
     })
   }
 }
