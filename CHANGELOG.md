@@ -5,6 +5,24 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.12.0](https://github.com/koshuang/speaking-clock/compare/v1.11.0...v1.12.0) (2026-02-01)
+
+
+### Features
+
+* **auth:** add Supabase authentication and cloud sync ([1a332d1](https://github.com/koshuang/speaking-clock/commit/1a332d18d2d394abdcd33a8638b11a9ec48e9b2b))
+* **ci:** add CI workflow and IaC infrastructure ([ed54ea1](https://github.com/koshuang/speaking-clock/commit/ed54ea1dab527faed4df64ef48ca646752be31ce))
+
+
+### Bug Fixes
+
+* resolve all ESLint errors and warnings ([a39e701](https://github.com/koshuang/speaking-clock/commit/a39e701ecc963a59d6979916d8b9f626d2c7904f))
+
+
+### Documentation
+
+* add AI-assisted development guide ([b80a7c5](https://github.com/koshuang/speaking-clock/commit/b80a7c511cb8cf933927288ccc918de26a684b7b))
+
 ## [1.11.0](https://github.com/koshuang/speaking-clock/compare/v1.10.0...v1.11.0) (2026-01-28)
 
 
