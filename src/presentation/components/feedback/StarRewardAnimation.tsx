@@ -29,6 +29,8 @@ export function StarRewardAnimation({
 
   useEffect(() => {
     if (show && stars > 0) {
+      // Animation state initialization - intentional
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true)
       setPhase('enter')
 

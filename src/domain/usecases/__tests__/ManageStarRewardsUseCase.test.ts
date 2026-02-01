@@ -63,7 +63,7 @@ describe('ManageStarRewardsUseCase', () => {
     })
 
     it('should track combo count', () => {
-      let state = savedState
+      const state = savedState
 
       const result1 = useCase.addStarsForCompletion(state, false)
       expect(result1.state.currentCombo).toBe(1)
@@ -73,7 +73,7 @@ describe('ManageStarRewardsUseCase', () => {
     })
 
     it('should give combo bonus every 3 completions', () => {
-      let state = savedState
+      const state = savedState
 
       // Complete 2 tasks (no bonus)
       const result1 = useCase.addStarsForCompletion(state, false)

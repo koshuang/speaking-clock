@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 interface CelebrationAnimationProps {
   show: boolean
@@ -24,16 +24,21 @@ export function CelebrationAnimation({ show, onComplete }: CelebrationAnimationP
     }
   }, [show, onComplete])
 
-  if (!show) return null
+  // Generate 20 confetti particles - memoized to avoid regenerating on every render
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        left: Math.random() * 100, // random horizontal position %
+        delay: Math.random() * 0.5, // random delay 0-0.5s
+        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+        size: 8 + Math.random() * 8, // 8-16px
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [show] // Regenerate particles when show changes to true
+  )
 
-  // Generate 20 confetti particles
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100, // random horizontal position %
-    delay: Math.random() * 0.5, // random delay 0-0.5s
-    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-    size: 8 + Math.random() * 8, // 8-16px
-  }))
+  if (!show) return null
 
   return (
     <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">

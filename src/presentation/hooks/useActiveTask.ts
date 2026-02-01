@@ -22,7 +22,8 @@ export interface UseActiveTaskReturn {
 }
 
 export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActiveTaskReturn {
-  const [activeTask, setActiveTask] = useState<ActiveTaskState | null>(null)
+  // Load active task state from sessionStorage on initial render
+  const [activeTask, setActiveTask] = useState<ActiveTaskState | null>(() => activeTaskRepo.load())
   const [remainingSeconds, setRemainingSeconds] = useState(0)
   const [progress, setProgress] = useState(0)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -44,14 +45,6 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
   useEffect(() => {
     voiceIdRef.current = voiceId
   }, [voiceId])
-
-  // Load active task state on mount
-  useEffect(() => {
-    const savedState = activeTaskRepo.load()
-    if (savedState) {
-      setActiveTask(savedState)
-    }
-  }, [])
 
   // Find the active todo
   const activeTodo = activeTask
@@ -164,6 +157,7 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
     }
 
     if (!activeTask || !activeTodo || !activeTodo.durationMinutes) {
+      // Reset state when no active task - this is intentional initialization
       setRemainingSeconds(0)
       setProgress(0)
       return
@@ -265,6 +259,7 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
         timerRef.current = null
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTask?.todoId, activeTask?.status, activeTodo?.durationMinutes, completeTask])
 
   return {

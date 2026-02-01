@@ -67,8 +67,9 @@ export function useSpeakingClock(options?: UseSpeakingClockOptions) {
       return
     }
 
-    // 否則保存新選擇的語音
+    // 否則保存新選擇的語音（初始化時自動選擇語音）
     const newSettings = manageSettingsUseCase.updateVoiceId(settings, voiceToUse.id)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSettings(newSettings)
     speakTimeUseCase.setVoice(voiceToUse.id)
   }, [voices, settings.voiceId, speakTimeUseCase, manageSettingsUseCase, settings, voiceSelectorUseCase])

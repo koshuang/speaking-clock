@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
 import type { AuthState } from '../../domain/entities/Auth'
 import type { AuthRepository } from '../../domain/ports/AuthRepository'
@@ -36,6 +37,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     if (!isConfigured) {
+      // Supabase not configured - set initial state
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setState({ user: null, isLoading: false, error: null })
       return
     }

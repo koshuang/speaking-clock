@@ -227,6 +227,11 @@ export function App() {
 
   // Capture install prompt
   useEffect(() => {
+    // If already installed in standalone mode, don't show install button
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      return
+    }
+
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
@@ -234,12 +239,6 @@ export function App() {
     }
 
     window.addEventListener('beforeinstallprompt', handler)
-
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setShowInstallButton(false)
-    }
-
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
 

@@ -15,6 +15,8 @@ export function StarCounter({ count, animate = false }: StarCounterProps) {
 
   useEffect(() => {
     if (animate) {
+      // Trigger animation on prop change - intentional
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAnimating(true)
       const timer = setTimeout(() => setIsAnimating(false), 500)
       return () => clearTimeout(timer)
