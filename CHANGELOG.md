@@ -5,6 +5,14 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.12.3](https://github.com/koshuang/speaking-clock/compare/v1.12.2...v1.12.3) (2026-02-01)
+
+
+### Bug Fixes
+
+* **auth:** use correct redirect URL for GitHub Pages ([894242b](https://github.com/koshuang/speaking-clock/commit/894242b0076f1c34aac0750f1112c56e57e6efed))
+* **deps:** update dependency @supabase/supabase-js to v2.93.3 ([#52](https://github.com/koshuang/speaking-clock/issues/52)) ([a1bd5a2](https://github.com/koshuang/speaking-clock/commit/a1bd5a25615ee20440415a43d03b37ca16476477))
+
 ## [1.12.2](https://github.com/koshuang/speaking-clock/compare/v1.12.1...v1.12.2) (2026-02-01)
 
 
