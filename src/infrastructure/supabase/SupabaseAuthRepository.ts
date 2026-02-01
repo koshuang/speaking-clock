@@ -71,10 +71,12 @@ export class SupabaseAuthRepository implements AuthRepository {
       throw new Error('Supabase is not configured')
     }
 
+    // Use import.meta.env.BASE_URL to get the correct base path (e.g., /speaking-clock/)
+    const baseUrl = `${window.location.origin}${import.meta.env.BASE_URL}`
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: baseUrl,
       },
     })
 
