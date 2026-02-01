@@ -5,6 +5,21 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.12.1](https://github.com/koshuang/speaking-clock/compare/v1.12.0...v1.12.1) (2026-02-01)
+
+
+### Bug Fixes
+
+* **deps:** pin dependencies ([f479b16](https://github.com/koshuang/speaking-clock/commit/f479b16a7a895853a88e04245edbca95010cc513))
+* **deps:** pin dependencies ([9c4554a](https://github.com/koshuang/speaking-clock/commit/9c4554a93805034f224d140ff3af34a7ffea1f0f))
+* **deps:** pin dependencies ([8773214](https://github.com/koshuang/speaking-clock/commit/8773214aa406376eaa2de720e90e65a6fe85c116))
+* **deps:** pin dependencies ([5d06082](https://github.com/koshuang/speaking-clock/commit/5d06082e97f7761e96c2966034e7ff2c5f16f617))
+* **deps:** pin dependencies ([6250305](https://github.com/koshuang/speaking-clock/commit/62503051fee7afff232c3429da41ecb9a1b8d854))
+* **deps:** pin dependencies ([4bbf465](https://github.com/koshuang/speaking-clock/commit/4bbf465794be906f28343b7e1ac5b9d7b35d06d7))
+* **deps:** update dependency lucide-react to ^0.563.0 ([21dde27](https://github.com/koshuang/speaking-clock/commit/21dde27c34897b89951086ee6fca9d2565669ffe))
+* **deps:** update dependency lucide-react to ^0.563.0 ([5531168](https://github.com/koshuang/speaking-clock/commit/5531168b7e7770e0c1db9e07699fa3a0532b55a9))
+* ensure consistent midnight format across locales ([69c12a3](https://github.com/koshuang/speaking-clock/commit/69c12a3accdd08e967eacde8145747c1038f1329))
+
 ## [1.12.0](https://github.com/koshuang/speaking-clock/compare/v1.11.0...v1.12.0) (2026-02-01)
 
 
