@@ -5,18 +5,16 @@
 export class DisplayTimeFormatter {
   /**
    * Format time for display (HH:MM:SS)
+   * Uses manual formatting for consistent behavior across all environments
    *
    * @param date - Date to format
    * @returns Formatted time string
    */
   formatTime(date: Date): string {
-    return date.toLocaleTimeString('zh-TW', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      hourCycle: 'h23', // Force 0-23 format (midnight = 00:00, not 24:00)
-    })
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const seconds = date.getSeconds().toString().padStart(2, '0')
+    return `${hours}:${minutes}:${seconds}`
   }
 
   /**
@@ -36,16 +34,14 @@ export class DisplayTimeFormatter {
 
   /**
    * Format time without seconds (HH:MM)
+   * Uses manual formatting for consistent behavior across all environments
    *
    * @param date - Date to format
    * @returns Formatted time string without seconds
    */
   formatTimeShort(date: Date): string {
-    return date.toLocaleTimeString('zh-TW', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-      hourCycle: 'h23', // Force 0-23 format (midnight = 00:00, not 24:00)
-    })
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${hours}:${minutes}`
   }
 }
