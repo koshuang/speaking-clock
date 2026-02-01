@@ -5,6 +5,13 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.12.2](https://github.com/koshuang/speaking-clock/compare/v1.12.1...v1.12.2) (2026-02-01)
+
+
+### Bug Fixes
+
+* use manual time formatting for consistent behavior ([bbd1dda](https://github.com/koshuang/speaking-clock/commit/bbd1ddac494e578ff2a5c821406ed6fcea2acd05))
+
 ## [1.12.1](https://github.com/koshuang/speaking-clock/compare/v1.12.0...v1.12.1) (2026-02-01)
 
 
