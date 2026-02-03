@@ -5,6 +5,19 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.13.0](https://github.com/koshuang/speaking-clock/compare/v1.12.3...v1.13.0) (2026-02-03)
+
+
+### Features
+
+* add ultimate goal feature with Supabase sync ([93295d9](https://github.com/koshuang/speaking-clock/commit/93295d97891096173e4dc067dfcb718fac067f54))
+
+
+### Bug Fixes
+
+* **deps:** update react ([#53](https://github.com/koshuang/speaking-clock/issues/53)) ([7b5cd5c](https://github.com/koshuang/speaking-clock/commit/7b5cd5c721d723813779f2614c99417ac4c4190c))
+* **ui:** ensure avatar is perfectly circular ([ef45af1](https://github.com/koshuang/speaking-clock/commit/ef45af13947082dc6ed2830265b31e8a79bf4a01))
+
 ## [1.12.3](https://github.com/koshuang/speaking-clock/compare/v1.12.2...v1.12.3) (2026-02-01)
 
 
