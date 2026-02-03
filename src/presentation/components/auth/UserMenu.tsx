@@ -21,10 +21,8 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative h-8 w-8 rounded-full overflow-hidden"
+        <button
+          className="relative h-8 w-8 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           aria-label="使用者選單"
         >
           {user.avatarUrl ? (
@@ -38,7 +36,7 @@ export function UserMenu() {
               {initials}
             </div>
           )}
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <div className="flex items-center gap-2 p-2">
