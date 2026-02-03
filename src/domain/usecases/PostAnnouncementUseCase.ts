@@ -7,10 +7,13 @@ export interface PostAnnouncementContext {
   remainingSeconds: number
   nextUncompletedTodo: Todo | null
   childName?: string
+  // Goal-related fields
+  activeGoal?: { name: string; targetTime: string } | null
+  goalTimeUntilDeadline?: number // minutes until goal deadline
 }
 
 export interface PostAnnouncementResult {
-  type: 'active_task' | 'next_todo' | 'none'
+  type: 'active_task' | 'next_todo' | 'goal' | 'none'
   message: string | null
   todo: Todo | null
 }
@@ -33,8 +36,20 @@ export class PostAnnouncementUseCase {
    * @returns Result indicating what to announce
    */
   getNextAnnouncement(context: PostAnnouncementContext): PostAnnouncementResult {
-    const { activeTodo, activeTaskState, remainingSeconds, nextUncompletedTodo, childName } = context
+    const {
+      activeTodo,
+      activeTaskState,
+      remainingSeconds,
+      nextUncompletedTodo,
+      childName,
+      activeGoal,
+      goalTimeUntilDeadline,
+    } = context
     const namePrefix = childName ? `${childName}，` : ''
+
+    let baseMessage = ''
+    let resultType: 'active_task' | 'next_todo' | 'goal' | 'none' = 'none'
+    let resultTodo: Todo | null = null
 
     // Priority 1: Active task that is running (not paused)
     if (
@@ -45,33 +60,56 @@ export class PostAnnouncementUseCase {
       remainingSeconds > 0
     ) {
       const remainingMinutes = Math.ceil(remainingSeconds / 60)
-      const baseMessage = this.textGenerator.generateProgressText(
-        activeTodo.text,
-        remainingMinutes
-      )
-      return {
-        type: 'active_task',
-        message: `${namePrefix}${baseMessage}`,
-        todo: activeTodo,
-      }
+      baseMessage = this.textGenerator.generateProgressText(activeTodo.text, remainingMinutes)
+      resultType = 'active_task'
+      resultTodo = activeTodo
     }
-
     // Priority 2: Next uncompleted todo
-    if (nextUncompletedTodo) {
-      // Use the speak reminder format for next todo
-      const baseMessage = this.generateNextTodoMessage(nextUncompletedTodo)
+    else if (nextUncompletedTodo) {
+      baseMessage = this.generateNextTodoMessage(nextUncompletedTodo)
+      resultType = 'next_todo'
+      resultTodo = nextUncompletedTodo
+    }
+
+    // Add goal reminder if applicable
+    const goalReminder =
+      activeGoal && goalTimeUntilDeadline !== undefined
+        ? this.generateGoalReminderText(activeGoal.name, goalTimeUntilDeadline)
+        : null
+
+    // Construct final message
+    let finalMessage = ''
+    if (baseMessage && goalReminder) {
+      finalMessage = `${namePrefix}${baseMessage}。${goalReminder}`
+    } else if (baseMessage) {
+      finalMessage = `${namePrefix}${baseMessage}`
+    } else if (goalReminder) {
+      finalMessage = `${namePrefix}${goalReminder}`
+      resultType = 'goal'
+    }
+
+    // If there's a goal reminder but no other message, return goal type
+    if (!baseMessage && goalReminder) {
       return {
-        type: 'next_todo',
-        message: `${namePrefix}${baseMessage}`,
-        todo: nextUncompletedTodo,
+        type: 'goal',
+        message: finalMessage,
+        todo: null,
       }
     }
 
-    // Nothing to announce
+    // If no message at all
+    if (!finalMessage) {
+      return {
+        type: 'none',
+        message: null,
+        todo: null,
+      }
+    }
+
     return {
-      type: 'none',
-      message: null,
-      todo: null,
+      type: resultType,
+      message: finalMessage,
+      todo: resultTodo,
     }
   }
 
@@ -83,6 +121,39 @@ export class PostAnnouncementUseCase {
       return `接下來是${todo.text}，共 ${todo.durationMinutes} 分鐘`
     }
     return `接下來是${todo.text}`
+  }
+
+  /**
+   * Generate goal reminder text based on time until deadline
+   *
+   * @param goalName - Name of the goal
+   * @param minutesLeft - Minutes until deadline (negative if overdue)
+   * @returns Reminder text or null if no reminder needed
+   */
+  private generateGoalReminderText(goalName: string, minutesLeft: number): string | null {
+    // No reminder if more than 30 minutes away
+    if (minutesLeft > 30) {
+      return null
+    }
+
+    // Overdue
+    if (minutesLeft < 0) {
+      const minutesOverdue = Math.abs(minutesLeft)
+      return `已經超過${goalName}時間${minutesOverdue}分鐘`
+    }
+
+    // Less than 5 minutes
+    if (minutesLeft < 5) {
+      return `距離${goalName}只剩${minutesLeft}分鐘了`
+    }
+
+    // 5-15 minutes
+    if (minutesLeft < 15) {
+      return `距離${goalName}還有${minutesLeft}分鐘，請加快準備`
+    }
+
+    // 15-30 minutes
+    return `距離${goalName}還有${minutesLeft}分鐘`
   }
 
   /**

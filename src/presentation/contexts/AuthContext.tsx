@@ -8,6 +8,7 @@ import {
   SupabaseSyncSettingsRepository,
   SupabaseSyncTodoRepository,
   SupabaseSyncStarRewardsRepository,
+  SupabaseSyncUltimateGoalRepository,
 } from '../../infrastructure/supabase'
 
 interface AuthContextValue extends AuthState {
@@ -66,6 +67,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         new SupabaseSyncSettingsRepository(user.id)
         new SupabaseSyncTodoRepository(user.id)
         new SupabaseSyncStarRewardsRepository(user.id)
+        new SupabaseSyncUltimateGoalRepository(user.id)
         console.log('✅ 資料同步已啟動')
       } else {
         console.log('👋 已登出')

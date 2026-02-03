@@ -14,7 +14,11 @@
     "setup:all": "./scripts/setup/all.sh",
     "setup:prd": "./scripts/setup/init-prd.sh",
     "setup:github": "./scripts/infra/branch-protection.sh",
-    "infra:branch-protection": "./scripts/infra/branch-protection.sh"
+    "setup:supabase": "./scripts/setup/setup-supabase-cli.sh",
+    "infra:branch-protection": "./scripts/infra/branch-protection.sh",
+    "db:push": "supabase db push",
+    "db:migrate": "supabase migration list",
+    "db:new": "supabase migration new"
   },
   "dependencies": {
     "@dnd-kit/core": "6.3.1",

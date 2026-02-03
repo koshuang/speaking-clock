@@ -6,6 +6,7 @@ export interface Todo {
   order: number
   createdAt: number
   durationMinutes?: number
+  goalId?: string  // Links this todo to an UltimateGoal
 }
 
 export interface TodoList {

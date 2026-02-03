@@ -13,6 +13,7 @@
 - **正向回饋** - 任務完成時播放慶祝音效、紙屑動畫、中文鼓勵語
 - **星星獎勵** - 完成任務獲得星星、準時完成加分、連擊獎勵、每日進度環
 - **雲端同步** - 支援 Google/Email 登入，跨裝置同步設定與資料
+- **終極目標** - 設定目標時間（如 7:50 出門），系統自動計算開始時間並倒數提醒
 - **快速任務模板** - 22 種預設常用任務（日常、學習、自我照顧、遊戲）
 - **深色模式** - 支援淺色/深色/系統主題
 - **PWA 支援** - 可安裝到桌面或手機，支援離線使用
@@ -78,6 +79,7 @@ src/
 | PWA | vite-plugin-pwa |
 | 分析/Analytics | Google Analytics (gtag.js) |
 | 認證/同步 | Supabase (Auth + Database) |
+| 資料庫 Migration | Supabase CLI |
 | 測試 | Vitest |
 | 部署 | GitHub Pages + GitHub Actions |
 
@@ -112,6 +114,7 @@ npm run build
 | [UI/UX 設計指南](./docs/UI-UX-DESIGN-GUIDE.md) | 設計規範與元件指南 |
 | [Persona 文件](./docs/personas/) | 目標用戶角色描述 |
 | [Supabase 設定指南](./docs/SUPABASE-SETUP.md) | 雲端同步功能設定 |
+| [資料庫 Migration](./supabase/README.md) | Supabase CLI 與 Migration 管理 |
 | [CI/CD 設定指南](./docs/CI-CD-SETUP.md) | GitHub Actions 與 Renovate 設定 |
 | [AI 輔助開發指南](./docs/AI-ASSISTED-DEVELOPMENT.md) | 如何善用 AI 協作開發 |
 

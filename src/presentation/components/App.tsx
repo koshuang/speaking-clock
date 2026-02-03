@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards, useAuth } from '../hooks'
+import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards, useAuth, useUltimateGoal } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
 import { Toggle } from '@/presentation/components/ui/toggle'
@@ -17,6 +17,7 @@ import { CelebrationAnimation } from './feedback/CelebrationAnimation'
 import { StarRewardAnimation } from './feedback/StarRewardAnimation'
 import { StarCounter, DailyProgressRing } from './progress'
 import { LoginDialog, UserMenu, LoginButton } from './auth'
+import { GoalStatusIndicator, UltimateGoalPanel } from './goal'
 import { container } from '@/di/container'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -69,6 +70,23 @@ export function App() {
     clearLastEarned,
   } = useStarRewards()
 
+  const {
+    // List operations
+    goals,
+    selectedGoalId,
+    setSelectedGoalId,
+    addGoal,
+    updateGoal,
+    removeGoal,
+    toggleGoalEnabled,
+    addTodoToGoal,
+    removeTodoFromGoal,
+    // Active goal data
+    activeGoal,
+    timeUntilDeadline,
+    isOverdue,
+  } = useUltimateGoal({ items: todos })
+
   // Use refs to store values needed in handleTimeSpoken callback
   const activeTaskDataRef = useRef<{
     activeTodo: typeof activeTodo
@@ -77,12 +95,14 @@ export function App() {
     selectedVoiceId: string | null
     childName?: string
     childMode: boolean
-  }>({ activeTodo: null, remainingSeconds: 0, isPaused: false, selectedVoiceId: null, childMode: false })
+    activeGoal: typeof activeGoal
+    goalTimeUntilDeadline: number
+  }>({ activeTodo: null, remainingSeconds: 0, isPaused: false, selectedVoiceId: null, childMode: false, activeGoal: null, goalTimeUntilDeadline: 0 })
 
   const [isSpeakingReminder, setIsSpeakingReminder] = useState(false)
 
   const handleTimeSpoken = useCallback(() => {
-    const { activeTodo, remainingSeconds, isPaused, selectedVoiceId, childName, childMode } = activeTaskDataRef.current
+    const { activeTodo, remainingSeconds, isPaused, selectedVoiceId, childName, childMode, activeGoal: goalData, goalTimeUntilDeadline } = activeTaskDataRef.current
     const rate = childMode ? container.childModeSettingsUseCase.getChildModeSpeechRate() : undefined
     const announcement = container.postAnnouncementUseCase.getNextAnnouncement({
       activeTodo,
@@ -94,9 +114,11 @@ export function App() {
       remainingSeconds,
       nextUncompletedTodo,
       childName,
+      activeGoal: goalData?.enabled ? { name: goalData.name, targetTime: goalData.targetTime } : null,
+      goalTimeUntilDeadline,
     })
 
-    if (announcement.type === 'active_task' && announcement.message) {
+    if (announcement.message) {
       setIsSpeakingReminder(true)
       container.speechSynthesizer.speak(announcement.message, selectedVoiceId ?? undefined, () => {
         setIsSpeakingReminder(false)
@@ -142,8 +164,10 @@ export function App() {
       selectedVoiceId,
       childName: settings.childName,
       childMode: settings.childMode,
+      activeGoal,
+      goalTimeUntilDeadline: timeUntilDeadline,
     }
-  }, [activeTodo, remainingSeconds, isPaused, selectedVoiceId, settings.childName, settings.childMode])
+  }, [activeTodo, remainingSeconds, isPaused, selectedVoiceId, settings.childName, settings.childMode, activeGoal, timeUntilDeadline])
 
   // Sync voice selection between clock and reminder
   const handleVoiceChange = useCallback(
@@ -473,6 +497,23 @@ export function App() {
                 </CardContent>
               </Card>
 
+              {/* Goal Status - Show on homepage */}
+              {activeGoal && (
+                <Card
+                  className="cursor-pointer transition-colors hover:bg-accent/50"
+                  onClick={() => setActiveTab('todo')}
+                >
+                  <CardContent className="py-3">
+                    <GoalStatusIndicator
+                      goal={activeGoal}
+                      timeUntilDeadline={timeUntilDeadline}
+                      isOverdue={isOverdue}
+                      variant="card"
+                    />
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Daily Progress Ring */}
               {todos.length > 0 && (
                 <Card>
@@ -490,33 +531,55 @@ export function App() {
           )}
 
           {activeTab === 'todo' && (
-            <Card className={isSpeakingReminder ? 'animate-pulse ring-2 ring-primary' : ''}>
-              <CardContent className="space-y-4">
-                <div>
-                  <h2 className="text-lg font-semibold">待辦提醒</h2>
-                  <p className="text-xs text-muted-foreground">
-                    報時後會語音提醒下一個待辦事項
-                  </p>
-                </div>
-                <TodoForm onAdd={addTodo} childMode={settings.childMode} />
-                <TodoList
-                  todos={todos}
-                  nextTodoId={nextUncompletedTodo?.id ?? null}
-                  activeTodoId={activeTodo?.id ?? null}
-                  remainingSeconds={remainingSeconds}
-                  progress={progress}
-                  isPaused={isPaused}
-                  onToggle={toggleTodo}
-                  onUpdate={updateTodo}
-                  onRemove={removeTodo}
-                  onReorder={reorderTodos}
-                  onStartTask={startTask}
-                  onPauseTask={pauseTask}
-                  onResumeTask={resumeTask}
-                  onCompleteTask={handleManualComplete}
-                />
-              </CardContent>
-            </Card>
+            <>
+              {/* Ultimate Goal Panel */}
+              <Card>
+                <CardContent>
+                  <UltimateGoalPanel
+                    goals={goals}
+                    todos={todos}
+                    selectedGoalId={selectedGoalId}
+                    activeGoal={activeGoal}
+                    onSelectGoal={setSelectedGoalId}
+                    onAddGoal={addGoal}
+                    onUpdateGoal={updateGoal}
+                    onRemoveGoal={removeGoal}
+                    onToggleGoalEnabled={toggleGoalEnabled}
+                    onAddTodoToGoal={addTodoToGoal}
+                    onRemoveTodoFromGoal={removeTodoFromGoal}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Todo List */}
+              <Card className={isSpeakingReminder ? 'animate-pulse ring-2 ring-primary' : ''}>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h2 className="text-lg font-semibold">待辦提醒</h2>
+                    <p className="text-xs text-muted-foreground">
+                      報時後會語音提醒下一個待辦事項
+                    </p>
+                  </div>
+                  <TodoForm onAdd={addTodo} childMode={settings.childMode} />
+                  <TodoList
+                    todos={todos}
+                    nextTodoId={nextUncompletedTodo?.id ?? null}
+                    activeTodoId={activeTodo?.id ?? null}
+                    remainingSeconds={remainingSeconds}
+                    progress={progress}
+                    isPaused={isPaused}
+                    onToggle={toggleTodo}
+                    onUpdate={updateTodo}
+                    onRemove={removeTodo}
+                    onReorder={reorderTodos}
+                    onStartTask={startTask}
+                    onPauseTask={pauseTask}
+                    onResumeTask={resumeTask}
+                    onCompleteTask={handleManualComplete}
+                  />
+                </CardContent>
+              </Card>
+            </>
           )}
 
           {activeTab === 'settings' && (

@@ -15,6 +15,8 @@ import {
   CompletionFeedbackUseCase,
   ChildModeSettingsUseCase,
   ManageStarRewardsUseCase,
+  UltimateGoalUseCase,
+  GoalReminderTextGenerator,
 } from '../domain/usecases'
 import {
   WebSpeechSynthesizer,
@@ -27,11 +29,14 @@ import {
   SupabaseSyncSettingsRepository,
   SupabaseSyncTodoRepository,
   SupabaseSyncStarRewardsRepository,
+  SupabaseSyncUltimateGoalRepository,
+  LocalStorageUltimateGoalRepository,
 } from '../infrastructure'
 import { SessionStorageActiveTaskStateRepository } from '../infrastructure/repositories/ActiveTaskStateRepository'
 import type { SettingsRepository } from '../domain/ports/SettingsRepository'
 import type { TodoRepository } from '../domain/ports/TodoRepository'
 import type { StarRewardsRepository } from '../domain/ports/StarRewardsRepository'
+import type { UltimateGoalRepository } from '../domain/ports/UltimateGoalRepository'
 
 // Infrastructure instances
 const speechSynthesizer = new WebSpeechSynthesizer()
@@ -42,6 +47,7 @@ const activeTaskStateRepository = new SessionStorageActiveTaskStateRepository()
 const soundEffectPlayer = new SoundEffectPlayer()
 const starRewardsRepository = new LocalStorageStarRewardsRepository()
 const authRepository = new SupabaseAuthRepository()
+const ultimateGoalRepository = new LocalStorageUltimateGoalRepository()
 
 // Factory functions for authenticated repositories
 export function createSyncSettingsRepository(userId: string): SettingsRepository {
@@ -54,6 +60,10 @@ export function createSyncTodoRepository(userId: string): TodoRepository {
 
 export function createSyncStarRewardsRepository(userId: string): StarRewardsRepository {
   return new SupabaseSyncStarRewardsRepository(userId)
+}
+
+export function createSyncUltimateGoalRepository(userId: string): UltimateGoalRepository {
+  return new SupabaseSyncUltimateGoalRepository(userId)
 }
 
 // Use case instances
@@ -73,6 +83,8 @@ const taskTemplateUseCase = new TaskTemplateUseCase()
 const completionFeedbackUseCase = new CompletionFeedbackUseCase()
 const childModeSettingsUseCase = new ChildModeSettingsUseCase()
 const manageStarRewardsUseCase = new ManageStarRewardsUseCase(starRewardsRepository)
+const ultimateGoalUseCase = new UltimateGoalUseCase(ultimateGoalRepository)
+const goalReminderTextGenerator = new GoalReminderTextGenerator()
 
 export const container = {
   speechSynthesizer,
@@ -99,4 +111,7 @@ export const container = {
   starRewardsRepository,
   manageStarRewardsUseCase,
   authRepository,
+  ultimateGoalRepository,
+  ultimateGoalUseCase,
+  goalReminderTextGenerator,
 }
