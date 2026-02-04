@@ -5,6 +5,18 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.13.2](https://github.com/koshuang/speaking-clock/compare/v1.13.1...v1.13.2) (2026-02-04)
+
+
+### Bug Fixes
+
+* **sync:** prevent star rewards data loss during cross-device sync ([3eeba8a](https://github.com/koshuang/speaking-clock/commit/3eeba8afa8fbe0282c72ba2dd15700e76468808c))
+
+
+### Code Refactoring
+
+* **task:** implement Clean Architecture for task completion ([c912d5e](https://github.com/koshuang/speaking-clock/commit/c912d5e4dce3e4ed772f4335b756fd38203f9158))
+
 ## [1.13.1](https://github.com/koshuang/speaking-clock/compare/v1.13.0...v1.13.1) (2026-02-04)
 
 
