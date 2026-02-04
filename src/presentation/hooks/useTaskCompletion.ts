@@ -2,20 +2,9 @@ import { useCallback, useState } from 'react'
 import type { Todo } from '@/domain/entities/Todo'
 import { container } from '@/di/container'
 
-export interface TaskCompletionCallbacks {
-  onToggleTodo: (id: string) => void
-  onClearActiveTask: () => void
-}
-
-export interface TaskCompletionState {
-  showCelebration: boolean
-  showStarReward: boolean
-}
-
 export interface UseTaskCompletionReturn {
   showCelebration: boolean
   showStarReward: boolean
-  lastEarnedStars: { stars: number; hasComboBonus: boolean } | null
   completeTask: (todoId: string, isTimedTask: boolean) => void
   toggleTaskCompletion: (todoId: string) => void
   clearCelebration: () => void
@@ -30,7 +19,9 @@ interface UseTaskCompletionOptions {
   selectedVoiceId: string | null
   onToggleTodo: (id: string) => void
   onClearActiveTask: () => void
-  onStarsAdded?: (stars: number, hasComboBonus: boolean) => void
+  // Star reward functions from useStarRewards
+  onAddStars: (isOnTime: boolean) => { starsEarned: number; hasComboBonus: boolean }
+  onAddDailyBonus: () => void
 }
 
 /**
@@ -47,11 +38,11 @@ export function useTaskCompletion({
   selectedVoiceId,
   onToggleTodo,
   onClearActiveTask,
-  onStarsAdded,
+  onAddStars,
+  onAddDailyBonus,
 }: UseTaskCompletionOptions): UseTaskCompletionReturn {
   const {
     taskCompletionUseCase,
-    manageStarRewardsUseCase,
     completionFeedbackUseCase,
     childModeSettingsUseCase,
     speechSynthesizer,
@@ -60,11 +51,6 @@ export function useTaskCompletion({
 
   const [showCelebration, setShowCelebration] = useState(false)
   const [showStarReward, setShowStarReward] = useState(false)
-  const [lastEarnedStars, setLastEarnedStars] = useState<{
-    stars: number
-    hasComboBonus: boolean
-  } | null>(null)
-  const [starState, setStarState] = useState(() => manageStarRewardsUseCase.load())
 
   /**
    * 完成任務（核心邏輯）
@@ -85,17 +71,13 @@ export function useTaskCompletion({
       // 使用 Domain UseCase 判斷是否準時完成
       const isOnTime = taskCompletionUseCase.isCompletedOnTime(isTimedTask, remainingSeconds)
 
-      // 增加星星獎勵
-      const result = manageStarRewardsUseCase.addStarsForCompletion(starState, isOnTime)
-      setStarState(result.state)
-      setLastEarnedStars({ stars: result.starsEarned, hasComboBonus: result.hasComboBonus })
+      // 增加星星獎勵 (使用外部傳入的 useStarRewards 函數)
+      onAddStars(isOnTime)
       setShowStarReward(true)
-      onStarsAdded?.(result.starsEarned, result.hasComboBonus)
 
       // 使用 Domain UseCase 檢查是否完成所有任務
       if (taskCompletionUseCase.willCompleteAllTasks({ items: todos }, todoId)) {
-        const dailyResult = manageStarRewardsUseCase.addDailyCompletionBonus(result.state)
-        setStarState(dailyResult.state)
+        onAddDailyBonus()
       }
 
       // 兒童模式慶祝動畫
@@ -118,16 +100,15 @@ export function useTaskCompletion({
       remainingSeconds,
       childMode,
       selectedVoiceId,
-      starState,
       taskCompletionUseCase,
-      manageStarRewardsUseCase,
       completionFeedbackUseCase,
       childModeSettingsUseCase,
       speechSynthesizer,
       soundEffectPlayer,
       onToggleTodo,
       onClearActiveTask,
-      onStarsAdded,
+      onAddStars,
+      onAddDailyBonus,
     ]
   )
 
@@ -159,13 +140,11 @@ export function useTaskCompletion({
 
   const clearStarReward = useCallback(() => {
     setShowStarReward(false)
-    setLastEarnedStars(null)
   }, [])
 
   return {
     showCelebration,
     showStarReward,
-    lastEarnedStars,
     completeTask,
     toggleTaskCompletion,
     clearCelebration,

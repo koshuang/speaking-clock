@@ -62,6 +62,10 @@ export function App() {
   const {
     todayStars,
     dailyGoal,
+    lastEarned,
+    addStars,
+    addDailyBonus,
+    clearLastEarned,
   } = useStarRewards()
 
   const {
@@ -153,7 +157,6 @@ export function App() {
   const {
     showCelebration,
     showStarReward,
-    lastEarnedStars,
     completeTask: handleTaskComplete,
     toggleTaskCompletion: handleTodoToggle,
     clearCelebration,
@@ -166,6 +169,8 @@ export function App() {
     selectedVoiceId,
     onToggleTodo: toggleTodo,
     onClearActiveTask: completeTask,
+    onAddStars: addStars,
+    onAddDailyBonus: addDailyBonus,
   })
 
   // Manual complete for active timer task
@@ -641,9 +646,12 @@ export function App() {
       {/* Star Reward Animation */}
       <StarRewardAnimation
         show={showStarReward}
-        stars={lastEarnedStars?.stars ?? 0}
-        hasComboBonus={lastEarnedStars?.hasComboBonus ?? false}
-        onComplete={clearStarReward}
+        stars={lastEarned?.stars ?? 0}
+        hasComboBonus={lastEarned?.hasComboBonus ?? false}
+        onComplete={() => {
+          clearStarReward()
+          clearLastEarned()
+        }}
       />
 
       {/* Login Dialog */}
