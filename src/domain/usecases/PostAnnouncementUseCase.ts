@@ -128,31 +128,31 @@ export class PostAnnouncementUseCase {
    *
    * @param goalName - Name of the goal
    * @param minutesLeft - Minutes until deadline (negative if overdue)
-   * @returns Reminder text or null if no reminder needed
+   * @returns Reminder text (always returns a message when there's an active goal)
    */
-  private generateGoalReminderText(goalName: string, minutesLeft: number): string | null {
-    // No reminder if more than 30 minutes away
-    if (minutesLeft > 30) {
-      return null
-    }
-
+  private generateGoalReminderText(goalName: string, minutesLeft: number): string {
     // Overdue
     if (minutesLeft < 0) {
       const minutesOverdue = Math.abs(minutesLeft)
       return `已經超過${goalName}時間${minutesOverdue}分鐘`
     }
 
-    // Less than 5 minutes
+    // Less than 5 minutes - urgent
     if (minutesLeft < 5) {
       return `距離${goalName}只剩${minutesLeft}分鐘了`
     }
 
-    // 5-15 minutes
+    // 5-15 minutes - moderate urgency
     if (minutesLeft < 15) {
       return `距離${goalName}還有${minutesLeft}分鐘，請加快準備`
     }
 
     // 15-30 minutes
+    if (minutesLeft < 30) {
+      return `距離${goalName}還有${minutesLeft}分鐘`
+    }
+
+    // > 30 minutes - just informational
     return `距離${goalName}還有${minutesLeft}分鐘`
   }
 

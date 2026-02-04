@@ -168,6 +168,165 @@ describe('PostAnnouncementUseCase', () => {
     })
   })
 
+  describe('goal reminder integration', () => {
+    it('should append goal reminder to active task message when goal <= 30 min', () => {
+      const activeTodo = createTodo({ text: '寫功課', durationMinutes: 30 })
+      const result = useCase.getNextAnnouncement({
+        activeTodo,
+        activeTaskState: createActiveTaskState(),
+        remainingSeconds: 900, // 15 minutes
+        nextUncompletedTodo: null,
+        activeGoal: { name: '出門', targetTime: '08:00' },
+        goalTimeUntilDeadline: 20,
+      })
+
+      expect(result.type).toBe('active_task')
+      expect(result.message).toContain('寫功課')
+      expect(result.message).toContain('出門')
+      expect(result.message).toContain('20分鐘')
+    })
+
+    it('should include goal reminder when goal > 30 min away', () => {
+      const activeTodo = createTodo({ text: '寫功課', durationMinutes: 30 })
+      const result = useCase.getNextAnnouncement({
+        activeTodo,
+        activeTaskState: createActiveTaskState(),
+        remainingSeconds: 900,
+        nextUncompletedTodo: null,
+        activeGoal: { name: '出門', targetTime: '08:00' },
+        goalTimeUntilDeadline: 45, // > 30 minutes - still included
+      })
+
+      expect(result.type).toBe('active_task')
+      expect(result.message).toContain('寫功課')
+      expect(result.message).toContain('出門')
+      expect(result.message).toContain('45分鐘')
+    })
+
+    it('should append goal reminder to next todo message when goal <= 30 min', () => {
+      const nextTodo = createTodo({ text: '練鋼琴' })
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: nextTodo,
+        activeGoal: { name: '上學', targetTime: '07:50' },
+        goalTimeUntilDeadline: 15,
+      })
+
+      expect(result.type).toBe('next_todo')
+      expect(result.message).toContain('練鋼琴')
+      expect(result.message).toContain('上學')
+      expect(result.message).toContain('15分鐘')
+    })
+
+    it('should return goal-only message when no task but goal <= 30 min', () => {
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: null,
+        activeGoal: { name: '出門', targetTime: '08:00' },
+        goalTimeUntilDeadline: 10,
+      })
+
+      expect(result.type).toBe('goal')
+      expect(result.message).toContain('出門')
+      expect(result.message).toContain('10分鐘')
+      expect(result.todo).toBeNull()
+    })
+
+    it('should return goal when no task and goal > 30 min', () => {
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: null,
+        activeGoal: { name: '出門', targetTime: '08:00' },
+        goalTimeUntilDeadline: 60, // > 30 minutes - still included
+      })
+
+      expect(result.type).toBe('goal')
+      expect(result.message).toContain('出門')
+      expect(result.message).toContain('60分鐘')
+    })
+
+    it('should include overdue warning when goal is past deadline', () => {
+      const activeTodo = createTodo({ text: '穿衣服', durationMinutes: 5 })
+      const result = useCase.getNextAnnouncement({
+        activeTodo,
+        activeTaskState: createActiveTaskState(),
+        remainingSeconds: 180,
+        nextUncompletedTodo: null,
+        activeGoal: { name: '上學', targetTime: '07:50' },
+        goalTimeUntilDeadline: -15, // 15 minutes overdue
+      })
+
+      expect(result.type).toBe('active_task')
+      expect(result.message).toContain('穿衣服')
+      expect(result.message).toContain('上學')
+      expect(result.message).toContain('超過')
+      expect(result.message).toContain('15分鐘')
+    })
+
+    it('should use urgent language when goal < 5 min', () => {
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: null,
+        activeGoal: { name: '出門', targetTime: '08:00' },
+        goalTimeUntilDeadline: 3,
+      })
+
+      expect(result.message).toContain('只剩')
+      expect(result.message).toContain('3分鐘')
+    })
+
+    it('should use moderate urgency when goal 5-15 min', () => {
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: null,
+        activeGoal: { name: '出門', targetTime: '08:00' },
+        goalTimeUntilDeadline: 10,
+      })
+
+      expect(result.message).toContain('加快準備')
+    })
+
+    it('should NOT include goal when activeGoal is null', () => {
+      const activeTodo = createTodo({ text: '寫功課', durationMinutes: 30 })
+      const result = useCase.getNextAnnouncement({
+        activeTodo,
+        activeTaskState: createActiveTaskState(),
+        remainingSeconds: 900,
+        nextUncompletedTodo: null,
+        activeGoal: null,
+        goalTimeUntilDeadline: 20,
+      })
+
+      expect(result.message).toContain('寫功課')
+      expect(result.message).not.toContain('出門')
+    })
+
+    it('should NOT include goal when goalTimeUntilDeadline is undefined', () => {
+      const activeTodo = createTodo({ text: '寫功課', durationMinutes: 30 })
+      const result = useCase.getNextAnnouncement({
+        activeTodo,
+        activeTaskState: createActiveTaskState(),
+        remainingSeconds: 900,
+        nextUncompletedTodo: null,
+        activeGoal: { name: '出門', targetTime: '08:00' },
+        goalTimeUntilDeadline: undefined,
+      })
+
+      expect(result.message).toContain('寫功課')
+      expect(result.message).not.toContain('出門')
+    })
+  })
+
   describe('childName support', () => {
     it('should prepend childName to active task message', () => {
       const activeTodo = createTodo({ text: '寫功課', durationMinutes: 30 })

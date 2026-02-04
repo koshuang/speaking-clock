@@ -238,9 +238,28 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
           }
         }
 
-        // Auto-complete when time reaches 0
+        // When time reaches 0, announce but don't auto-complete
+        // User needs to manually click complete button
         if (taskDurationUseCase.isTaskComplete(currentTask, durationMinutes)) {
-          completeTask()
+          const currentTodo = todosRef.current.find(
+            (t) => t.id === currentTask.todoId
+          )
+          if (currentTodo && !currentTask.timeUpAnnounced) {
+            container.speechSynthesizer.speak(
+              `${currentTodo.text}，時間到了`,
+              voiceIdRef.current ?? undefined
+            )
+            // Mark as announced to prevent repeated announcements
+            setActiveTask((prev) => {
+              if (!prev) return prev
+              const updatedState: ActiveTaskState = {
+                ...prev,
+                timeUpAnnounced: true,
+              }
+              activeTaskRepo.save(updatedState)
+              return updatedState
+            })
+          }
         }
       }
     }

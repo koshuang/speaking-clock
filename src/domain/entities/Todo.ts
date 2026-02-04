@@ -19,6 +19,7 @@ export interface ActiveTaskState {
   startedAt: number
   accumulatedTime: number
   lastAnnouncedCheckpoint?: string
+  timeUpAnnounced?: boolean
 }
 
 export const DEFAULT_TODO_LIST: TodoList = {

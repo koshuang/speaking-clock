@@ -5,11 +5,10 @@ import type { TodoList } from '../../domain/entities/Todo'
 import { container } from '../../di/container'
 
 export function useUltimateGoal(todoList: TodoList) {
-  const { ultimateGoalUseCase, goalReminderTextGenerator, speechSynthesizer } = container
+  const { ultimateGoalUseCase } = container
 
   const [goalList, setGoalList] = useState<GoalList>(() => ultimateGoalUseCase.load())
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
-  const lastReminderRef = useRef<Map<string, number>>(new Map())
   const timeUpdateIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [, forceUpdate] = useState({}) // For triggering re-renders on time updates
 
@@ -43,33 +42,6 @@ export function useUltimateGoal(todoList: TodoList) {
     }
   }, [goalList, ultimateGoalUseCase])
 
-  // Check for reminders for all enabled goals
-  useEffect(() => {
-    const enabledGoals = ultimateGoalUseCase.getEnabledGoals(goalList)
-
-    for (const goal of enabledGoals) {
-      const { shouldRemind, minutesLeft } = ultimateGoalUseCase.shouldRemind(goal)
-      const lastReminder = lastReminderRef.current.get(goal.id)
-
-      if (shouldRemind && lastReminder !== Math.round(minutesLeft)) {
-        lastReminderRef.current.set(goal.id, Math.round(minutesLeft))
-        const message = goalReminderTextGenerator.generateDeadlineWarning(goal.name, Math.round(minutesLeft))
-        speechSynthesizer.speak(message)
-      }
-
-      // Check for overdue
-      const timeLeft = ultimateGoalUseCase.getTimeUntilDeadline(goal)
-      if (timeLeft < 0 && ultimateGoalUseCase.getRemainingTodos(goal, todoList).length > 0) {
-        const minutesOverdue = Math.abs(Math.round(timeLeft))
-        if (lastReminder !== -minutesOverdue && minutesOverdue <= 30) {
-          lastReminderRef.current.set(goal.id, -minutesOverdue)
-          const message = goalReminderTextGenerator.generateOverdueWarning(goal.name, minutesOverdue)
-          speechSynthesizer.speak(message)
-        }
-      }
-    }
-  }, [goalList, todoList, ultimateGoalUseCase, goalReminderTextGenerator, speechSynthesizer])
-
   const addGoal = useCallback(
     (name: string, targetTime: string, todoIds: string[] = []) => {
       const newGoal: UltimateGoal = {
@@ -101,7 +73,6 @@ export function useUltimateGoal(todoList: TodoList) {
     (goalId: string) => {
       const updated = ultimateGoalUseCase.removeGoal(goalList, goalId)
       setGoalList(updated)
-      lastReminderRef.current.delete(goalId)
       if (selectedGoalId === goalId) {
         setSelectedGoalId(null)
       }
@@ -113,7 +84,6 @@ export function useUltimateGoal(todoList: TodoList) {
     (goalId: string) => {
       const goal = ultimateGoalUseCase.getGoalById(goalList, goalId)
       if (!goal) return
-      lastReminderRef.current.delete(goalId)
       updateGoal(goalId, { enabled: !goal.enabled })
     },
     [goalList, ultimateGoalUseCase, updateGoal]
