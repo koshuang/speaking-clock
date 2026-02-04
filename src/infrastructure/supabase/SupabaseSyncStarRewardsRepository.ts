@@ -61,15 +61,25 @@ export class SupabaseSyncStarRewardsRepository implements StarRewardsRepository 
         if (error.code === 'PGRST116') {
           // No data found - upload local data to cloud
           const localRewards = this.load()
-          await this.syncToCloud(localRewards)
+          if (localRewards.totalStars > 0) {
+            await this.syncToCloud(localRewards)
+          }
         }
         return
       }
 
       if (data?.rewards) {
-        // Compare timestamps if available, or just use cloud data
         const cloudRewards = data.rewards as StarRewardsState
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cloudRewards))
+        const localRewards = this.load()
+
+        // Conflict resolution: keep the one with more total stars
+        // This prevents data loss when syncing between devices
+        if (cloudRewards.totalStars >= localRewards.totalStars) {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cloudRewards))
+        } else {
+          // Local has more stars, sync local to cloud
+          await this.syncToCloud(localRewards)
+        }
       }
     } catch {
       console.error('無法從雲端同步星星獎勵資料')
@@ -80,6 +90,23 @@ export class SupabaseSyncStarRewardsRepository implements StarRewardsRepository 
     if (!supabase) return
 
     try {
+      // First check if cloud has more stars (conflict resolution)
+      const { data: existingData } = await supabase
+        .from('user_star_rewards')
+        .select('rewards')
+        .eq('user_id', this.userId)
+        .single()
+
+      if (existingData?.rewards) {
+        const cloudRewards = existingData.rewards as StarRewardsState
+        // Don't overwrite if cloud has more stars
+        if (cloudRewards.totalStars > state.totalStars) {
+          // Instead, update local with cloud data
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cloudRewards))
+          return
+        }
+      }
+
       const { error } = await supabase
         .from('user_star_rewards')
         .upsert({
