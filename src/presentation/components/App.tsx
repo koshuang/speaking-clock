@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards, useAuth, useUltimateGoal } from '../hooks'
+import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards, useAuth, useUltimateGoal, useTaskCompletion } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
 import { Toggle } from '@/presentation/components/ui/toggle'
@@ -34,8 +34,6 @@ export function App() {
 
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
-  const [showCelebration, setShowCelebration] = useState(false)
-  const [showStarReward, setShowStarReward] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
 
   const { isAuthenticated, isConfigured: isAuthConfigured } = useAuth()
@@ -64,10 +62,6 @@ export function App() {
   const {
     todayStars,
     dailyGoal,
-    lastEarned,
-    addStars,
-    addDailyBonus,
-    clearLastEarned,
   } = useStarRewards()
 
   const {
@@ -155,6 +149,32 @@ export function App() {
     isPaused,
   } = useActiveTask(todos, selectedVoiceId)
 
+  // Task completion with star rewards - Clean Architecture pattern
+  const {
+    showCelebration,
+    showStarReward,
+    lastEarnedStars,
+    completeTask: handleTaskComplete,
+    toggleTaskCompletion: handleTodoToggle,
+    clearCelebration,
+    clearStarReward,
+  } = useTaskCompletion({
+    todos,
+    activeTodoId: activeTodo?.id ?? null,
+    remainingSeconds,
+    childMode: settings.childMode,
+    selectedVoiceId,
+    onToggleTodo: toggleTodo,
+    onClearActiveTask: completeTask,
+  })
+
+  // Manual complete for active timer task
+  const handleManualComplete = useCallback(() => {
+    if (activeTodo) {
+      handleTaskComplete(activeTodo.id, true)
+    }
+  }, [activeTodo, handleTaskComplete])
+
   // Keep ref in sync with current values
   useEffect(() => {
     activeTaskDataRef.current = {
@@ -184,36 +204,6 @@ export function App() {
       setTodoVoice(selectedVoiceId)
     }
   }, [selectedVoiceId, setTodoVoice])
-
-  // Manual complete: finish timer AND mark todo as completed
-  const handleManualComplete = useCallback(() => {
-    if (activeTodo) {
-      toggleTodo(activeTodo.id)
-    }
-
-    // Add star rewards - check if completed on time (remaining time > 0)
-    const isOnTime = remainingSeconds > 0
-    addStars(isOnTime)
-    setShowStarReward(true)
-
-    // Check if all tasks completed for daily bonus
-    const completedCount = todos.filter(t => t.completed).length + 1
-    const totalCount = todos.length
-    if (completedCount === totalCount && totalCount > 0) {
-      addDailyBonus()
-    }
-
-    // Child mode celebration
-    if (settings.childMode) {
-      setShowCelebration(true)
-      container.soundEffectPlayer.playCompletionSound()
-      const phrase = container.completionFeedbackUseCase.getRandomCompletionPhrase()
-      const rate = container.childModeSettingsUseCase.getChildModeSpeechRate()
-      container.speechSynthesizer.speak(phrase, selectedVoiceId ?? undefined, undefined, rate)
-    }
-
-    completeTask()
-  }, [activeTodo, toggleTodo, completeTask, settings.childMode, selectedVoiceId, remainingSeconds, addStars, addDailyBonus, todos])
 
   const {
     isSupported: wakeLockSupported,
@@ -457,7 +447,7 @@ export function App() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => toggleTodo(nextUncompletedTodo.id)}
+                          onClick={() => handleTodoToggle(nextUncompletedTodo.id)}
                           className="h-7 text-xs shrink-0"
                         >
                           <Check className="h-3 w-3 mr-1" />
@@ -568,7 +558,7 @@ export function App() {
                     remainingSeconds={remainingSeconds}
                     progress={progress}
                     isPaused={isPaused}
-                    onToggle={toggleTodo}
+                    onToggle={handleTodoToggle}
                     onUpdate={updateTodo}
                     onRemove={removeTodo}
                     onReorder={reorderTodos}
@@ -646,17 +636,14 @@ export function App() {
       )}
 
       {/* Celebration Animation */}
-      <CelebrationAnimation show={showCelebration} onComplete={() => setShowCelebration(false)} />
+      <CelebrationAnimation show={showCelebration} onComplete={clearCelebration} />
 
       {/* Star Reward Animation */}
       <StarRewardAnimation
         show={showStarReward}
-        stars={lastEarned?.stars ?? 0}
-        hasComboBonus={lastEarned?.hasComboBonus ?? false}
-        onComplete={() => {
-          setShowStarReward(false)
-          clearLastEarned()
-        }}
+        stars={lastEarnedStars?.stars ?? 0}
+        hasComboBonus={lastEarnedStars?.hasComboBonus ?? false}
+        onComplete={clearStarReward}
       />
 
       {/* Login Dialog */}

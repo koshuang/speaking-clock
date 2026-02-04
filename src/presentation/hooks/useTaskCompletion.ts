@@ -1,0 +1,174 @@
+import { useCallback, useState } from 'react'
+import type { Todo } from '@/domain/entities/Todo'
+import { container } from '@/di/container'
+
+export interface TaskCompletionCallbacks {
+  onToggleTodo: (id: string) => void
+  onClearActiveTask: () => void
+}
+
+export interface TaskCompletionState {
+  showCelebration: boolean
+  showStarReward: boolean
+}
+
+export interface UseTaskCompletionReturn {
+  showCelebration: boolean
+  showStarReward: boolean
+  lastEarnedStars: { stars: number; hasComboBonus: boolean } | null
+  completeTask: (todoId: string, isTimedTask: boolean) => void
+  toggleTaskCompletion: (todoId: string) => void
+  clearCelebration: () => void
+  clearStarReward: () => void
+}
+
+interface UseTaskCompletionOptions {
+  todos: Todo[]
+  activeTodoId: string | null
+  remainingSeconds: number
+  childMode: boolean
+  selectedVoiceId: string | null
+  onToggleTodo: (id: string) => void
+  onClearActiveTask: () => void
+  onStarsAdded?: (stars: number, hasComboBonus: boolean) => void
+}
+
+/**
+ * useTaskCompletion Hook - 任務完成狀態管理
+ *
+ * 遵循 Clean Architecture 原則，使用 Domain 層的 TaskCompletionUseCase
+ * 處理任務完成的業務邏輯，Presentation 層只負責狀態管理和 UI 回饋
+ */
+export function useTaskCompletion({
+  todos,
+  activeTodoId,
+  remainingSeconds,
+  childMode,
+  selectedVoiceId,
+  onToggleTodo,
+  onClearActiveTask,
+  onStarsAdded,
+}: UseTaskCompletionOptions): UseTaskCompletionReturn {
+  const {
+    taskCompletionUseCase,
+    manageStarRewardsUseCase,
+    completionFeedbackUseCase,
+    childModeSettingsUseCase,
+    speechSynthesizer,
+    soundEffectPlayer,
+  } = container
+
+  const [showCelebration, setShowCelebration] = useState(false)
+  const [showStarReward, setShowStarReward] = useState(false)
+  const [lastEarnedStars, setLastEarnedStars] = useState<{
+    stars: number
+    hasComboBonus: boolean
+  } | null>(null)
+  const [starState, setStarState] = useState(() => manageStarRewardsUseCase.load())
+
+  /**
+   * 完成任務（核心邏輯）
+   * - 使用 Domain 層 UseCase 判斷業務規則
+   * - 處理星星獎勵
+   * - 觸發 UI 回饋
+   */
+  const completeTask = useCallback(
+    (todoId: string, isTimedTask: boolean) => {
+      const todo = todos.find((t) => t.id === todoId)
+
+      // 使用 Domain UseCase 檢查是否可以完成
+      if (!taskCompletionUseCase.canComplete(todo)) return
+
+      // 標記任務為已完成
+      onToggleTodo(todoId)
+
+      // 使用 Domain UseCase 判斷是否準時完成
+      const isOnTime = taskCompletionUseCase.isCompletedOnTime(isTimedTask, remainingSeconds)
+
+      // 增加星星獎勵
+      const result = manageStarRewardsUseCase.addStarsForCompletion(starState, isOnTime)
+      setStarState(result.state)
+      setLastEarnedStars({ stars: result.starsEarned, hasComboBonus: result.hasComboBonus })
+      setShowStarReward(true)
+      onStarsAdded?.(result.starsEarned, result.hasComboBonus)
+
+      // 使用 Domain UseCase 檢查是否完成所有任務
+      if (taskCompletionUseCase.willCompleteAllTasks({ items: todos }, todoId)) {
+        const dailyResult = manageStarRewardsUseCase.addDailyCompletionBonus(result.state)
+        setStarState(dailyResult.state)
+      }
+
+      // 兒童模式慶祝動畫
+      if (childMode) {
+        setShowCelebration(true)
+        soundEffectPlayer.playCompletionSound()
+        const phrase = completionFeedbackUseCase.getRandomCompletionPhrase()
+        const rate = childModeSettingsUseCase.getChildModeSpeechRate()
+        speechSynthesizer.speak(phrase, selectedVoiceId ?? undefined, undefined, rate)
+      }
+
+      // 如果是進行中的計時任務，清除計時器狀態
+      if (activeTodoId === todoId) {
+        onClearActiveTask()
+      }
+    },
+    [
+      todos,
+      activeTodoId,
+      remainingSeconds,
+      childMode,
+      selectedVoiceId,
+      starState,
+      taskCompletionUseCase,
+      manageStarRewardsUseCase,
+      completionFeedbackUseCase,
+      childModeSettingsUseCase,
+      speechSynthesizer,
+      soundEffectPlayer,
+      onToggleTodo,
+      onClearActiveTask,
+      onStarsAdded,
+    ]
+  )
+
+  /**
+   * 切換任務完成狀態
+   * - 完成時：走完整的 completeTask 流程（加星星）
+   * - 取消完成時：只切換狀態（不扣星星）
+   */
+  const toggleTaskCompletion = useCallback(
+    (todoId: string) => {
+      const todo = todos.find((t) => t.id === todoId)
+      if (!todo) return
+
+      if (taskCompletionUseCase.canUncomplete(todo)) {
+        // 取消完成 - 只切換狀態，不影響星星
+        onToggleTodo(todoId)
+      } else if (taskCompletionUseCase.canComplete(todo)) {
+        // 完成 - 使用完整流程
+        const isTimedTask = taskCompletionUseCase.isActiveTimedTask(todo, activeTodoId)
+        completeTask(todoId, isTimedTask)
+      }
+    },
+    [todos, activeTodoId, taskCompletionUseCase, onToggleTodo, completeTask]
+  )
+
+  const clearCelebration = useCallback(() => {
+    setShowCelebration(false)
+  }, [])
+
+  const clearStarReward = useCallback(() => {
+    setShowStarReward(false)
+    setLastEarnedStars(null)
+  }, [])
+
+  return {
+    showCelebration,
+    showStarReward,
+    lastEarnedStars,
+    completeTask,
+    toggleTaskCompletion,
+    clearCelebration,
+    clearStarReward,
+  }
+}
