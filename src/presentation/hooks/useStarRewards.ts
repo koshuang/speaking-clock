@@ -65,6 +65,14 @@ export function useStarRewards() {
     [manageStarRewardsUseCase, state]
   )
 
+  /**
+   * 從外部設定獎勵狀態（用於即時同步）
+   * 直接取代本地狀態，不觸發儲存（因為資料來自雲端）
+   */
+  const setRewardsFromExternal = useCallback((rewards: StarRewardsState) => {
+    setState(rewards)
+  }, [])
+
   // 計算當日進度
   const dailyProgress = manageStarRewardsUseCase.getDailyProgress(state)
 
@@ -81,5 +89,6 @@ export function useStarRewards() {
     resetCombo,
     clearLastEarned,
     updateDailyGoal,
+    setRewardsFromExternal,
   }
 }

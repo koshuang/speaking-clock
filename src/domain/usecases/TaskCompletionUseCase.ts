@@ -31,9 +31,12 @@ export class TaskCompletionUseCase {
     const todos = todoList.items
     if (todos.length === 0) return false
 
-    // 計算完成後的已完成數量
-    const completedCount = todos.filter(t => t.completed).length + 1
-    return completedCount === todos.length
+    // 計算完成後的已完成數量（排除正在完成的任務避免重複計算）
+    const currentlyCompleted = todos.filter(
+      t => t.completed && t.id !== completingTodoId
+    ).length
+    const willBeCompleted = currentlyCompleted + 1
+    return willBeCompleted === todos.length
   }
 
   /**

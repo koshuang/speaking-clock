@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards, useAuth, useUltimateGoal, useTaskCompletion } from '../hooks'
+import { useSpeakingClock, useWakeLock, useTodos, useActiveTask, useStarRewards, useAuth, useUltimateGoal, useTaskCompletion, useRealtimeSync } from '../hooks'
 import { Button } from '@/presentation/components/ui/button'
 import { Card, CardContent } from '@/presentation/components/ui/card'
 import { Toggle } from '@/presentation/components/ui/toggle'
@@ -36,7 +36,7 @@ export function App() {
   const [showInstallButton, setShowInstallButton] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
 
-  const { isAuthenticated, isConfigured: isAuthConfigured } = useAuth()
+  const { user, isAuthenticated, isConfigured: isAuthConfigured } = useAuth()
 
   const [showOnboarding, setShowOnboarding] = useState(() => {
     return !localStorage.getItem('onboarding-completed')
@@ -57,6 +57,7 @@ export function App() {
     nextUncompletedTodo,
     setVoice: setTodoVoice,
     speakReminder,
+    setTodosFromExternal,
   } = useTodos()
 
   const {
@@ -66,6 +67,7 @@ export function App() {
     addStars,
     addDailyBonus,
     clearLastEarned,
+    setRewardsFromExternal,
   } = useStarRewards()
 
   const {
@@ -79,11 +81,20 @@ export function App() {
     toggleGoalEnabled,
     addTodoToGoal,
     removeTodoFromGoal,
+    setGoalsFromExternal,
     // Active goal data
     activeGoal,
     timeUntilDeadline,
     isOverdue,
   } = useUltimateGoal({ items: todos })
+
+  // Realtime sync - 監聽其他裝置的資料變更
+  useRealtimeSync({
+    userId: user?.id ?? null,
+    onTodosChange: setTodosFromExternal,
+    onStarRewardsChange: setRewardsFromExternal,
+    onGoalsChange: setGoalsFromExternal,
+  })
 
   // Use refs to store values needed in handleTimeSpoken callback
   const activeTaskDataRef = useRef<{

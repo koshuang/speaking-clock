@@ -1,11 +1,19 @@
 import { useCallback, useState } from 'react'
-import type { TodoList } from '../../domain'
+import type { Todo, TodoList } from '../../domain'
 import { container } from '../../di/container'
 
 export function useTodos() {
   const { manageTodosUseCase, speakReminderUseCase } = container
 
   const [todoList, setTodoList] = useState<TodoList>(() => manageTodosUseCase.load())
+
+  /**
+   * 從外部設定 todos（用於即時同步）
+   * 直接取代本地狀態，不觸發儲存（因為資料來自雲端）
+   */
+  const setTodosFromExternal = useCallback((todos: Todo[]) => {
+    setTodoList({ items: todos })
+  }, [])
 
   const addTodo = useCallback(
     (text: string, icon?: string, durationMinutes?: number) => {
@@ -81,5 +89,6 @@ export function useTodos() {
     nextUncompletedTodo,
     setVoice,
     speakReminder,
+    setTodosFromExternal,
   }
 }

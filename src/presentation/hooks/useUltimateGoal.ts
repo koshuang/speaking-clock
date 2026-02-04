@@ -8,6 +8,14 @@ export function useUltimateGoal(todoList: TodoList) {
   const { ultimateGoalUseCase } = container
 
   const [goalList, setGoalList] = useState<GoalList>(() => ultimateGoalUseCase.load())
+
+  /**
+   * 從外部設定目標列表（用於即時同步）
+   * 直接取代本地狀態，不觸發儲存（因為資料來自雲端）
+   */
+  const setGoalsFromExternal = useCallback((goals: UltimateGoal[]) => {
+    setGoalList({ goals })
+  }, [])
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null)
   const timeUpdateIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [, forceUpdate] = useState({}) // For triggering re-renders on time updates
@@ -126,6 +134,7 @@ export function useUltimateGoal(todoList: TodoList) {
     toggleGoalEnabled,
     addTodoToGoal,
     removeTodoFromGoal,
+    setGoalsFromExternal,
 
     // Active goal (selected or next upcoming)
     activeGoal,
