@@ -124,17 +124,19 @@ describe('PostAnnouncementUseCase', () => {
       expect(result.todo).toBe(nextTodo)
     })
 
-    it('should skip active task if no duration set', () => {
+    it('should announce elapsed time for active task without duration', () => {
       const activeTodo = createTodo({ durationMinutes: undefined })
       const nextTodo = createTodo({ id: '2', text: '下一個' })
       const result = useCase.getNextAnnouncement({
         activeTodo,
         activeTaskState: createActiveTaskState(),
-        remainingSeconds: 900,
+        remainingSeconds: 900, // 15 minutes elapsed
         nextUncompletedTodo: nextTodo,
       })
 
-      expect(result.type).toBe('next_todo')
+      expect(result.type).toBe('active_task')
+      expect(result.message).toBe('測試任務已進行15分鐘')
+      expect(result.todo).toBe(activeTodo)
     })
 
     it('should prioritize active task over next todo', () => {

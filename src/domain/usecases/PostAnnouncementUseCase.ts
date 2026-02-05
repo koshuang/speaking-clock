@@ -1,6 +1,11 @@
 import type { Todo, ActiveTaskState } from '../entities/Todo'
 import { TaskReminderTextGenerator } from './TaskReminderTextGenerator'
 
+export interface DeadlineTodoInfo {
+  todo: Todo
+  minutesUntil: number // negative if overdue
+}
+
 export interface PostAnnouncementContext {
   activeTodo: Todo | null
   activeTaskState: ActiveTaskState | null
@@ -10,10 +15,12 @@ export interface PostAnnouncementContext {
   // Goal-related fields
   activeGoal?: { name: string; targetTime: string } | null
   goalTimeUntilDeadline?: number // minutes until goal deadline
+  // Deadline-related fields
+  deadlineTodos?: DeadlineTodoInfo[] // todos with deadlines, sorted by urgency
 }
 
 export interface PostAnnouncementResult {
-  type: 'active_task' | 'next_todo' | 'goal' | 'none'
+  type: 'active_task' | 'next_todo' | 'deadline' | 'goal' | 'none'
   message: string | null
   todo: Todo | null
 }
@@ -44,14 +51,15 @@ export class PostAnnouncementUseCase {
       childName,
       activeGoal,
       goalTimeUntilDeadline,
+      deadlineTodos,
     } = context
     const namePrefix = childName ? `${childName}，` : ''
 
     let baseMessage = ''
-    let resultType: 'active_task' | 'next_todo' | 'goal' | 'none' = 'none'
+    let resultType: 'active_task' | 'next_todo' | 'deadline' | 'goal' | 'none' = 'none'
     let resultTodo: Todo | null = null
 
-    // Priority 1: Active task that is running (not paused) with time remaining
+    // Priority 1: Active timed task that is running (not paused) with time remaining
     if (
       activeTodo &&
       activeTodo.durationMinutes &&
@@ -64,7 +72,7 @@ export class PostAnnouncementUseCase {
       resultType = 'active_task'
       resultTodo = activeTodo
     }
-    // Priority 2: Active task that has timed out (time <= 0) - remind to complete
+    // Priority 2: Active timed task that has timed out (time <= 0) - remind to complete
     else if (
       activeTodo &&
       activeTodo.durationMinutes &&
@@ -75,14 +83,36 @@ export class PostAnnouncementUseCase {
       resultType = 'active_task'
       resultTodo = activeTodo
     }
-    // Priority 3: Next uncompleted todo (but not the active timed-out task)
-    else if (nextUncompletedTodo && nextUncompletedTodo.id !== activeTodo?.id) {
-      baseMessage = this.generateNextTodoMessage(nextUncompletedTodo)
-      resultType = 'next_todo'
-      resultTodo = nextUncompletedTodo
+    // Priority 3: Active non-timed task - report elapsed time
+    else if (
+      activeTodo &&
+      !activeTodo.durationMinutes &&
+      activeTaskState &&
+      activeTaskState.status === 'active'
+    ) {
+      const elapsedMinutes = Math.floor(remainingSeconds / 60)
+      baseMessage = `${activeTodo.text}已進行${elapsedMinutes}分鐘`
+      resultType = 'active_task'
+      resultTodo = activeTodo
     }
-    // Priority 4: Next uncompleted todo without duration (non-timed task)
-    else if (nextUncompletedTodo && !nextUncompletedTodo.durationMinutes) {
+    // Priority 4: Deadline approaching or overdue (within 15 minutes or past due)
+    else if (deadlineTodos && deadlineTodos.length > 0) {
+      // Find the most urgent deadline todo (already sorted by urgency)
+      const urgentDeadline = deadlineTodos.find(
+        (d) => d.minutesUntil <= 15 && !d.todo.completed && d.todo.id !== activeTodo?.id
+      )
+      if (urgentDeadline) {
+        baseMessage = this.generateDeadlineReminderText(
+          urgentDeadline.todo.text,
+          urgentDeadline.minutesUntil
+        )
+        resultType = 'deadline'
+        resultTodo = urgentDeadline.todo
+      }
+    }
+
+    // Priority 5: Next uncompleted todo (but not the active task)
+    if (!baseMessage && nextUncompletedTodo && nextUncompletedTodo.id !== activeTodo?.id) {
       baseMessage = this.generateNextTodoMessage(nextUncompletedTodo)
       resultType = 'next_todo'
       resultTodo = nextUncompletedTodo
@@ -138,6 +168,28 @@ export class PostAnnouncementUseCase {
       return `接下來是${todo.text}，共 ${todo.durationMinutes} 分鐘`
     }
     return `接下來是${todo.text}`
+  }
+
+  /**
+   * Generate deadline reminder text based on time until deadline
+   *
+   * @param taskName - Name of the task
+   * @param minutesUntil - Minutes until deadline (negative if overdue)
+   * @returns Reminder text
+   */
+  private generateDeadlineReminderText(taskName: string, minutesUntil: number): string {
+    if (minutesUntil < 0) {
+      // Overdue
+      const minutesOverdue = Math.abs(minutesUntil)
+      return `${taskName}已經超過${minutesOverdue}分鐘了`
+    }
+
+    if (minutesUntil === 0) {
+      return `${taskName}時間到了`
+    }
+
+    // Still time remaining
+    return `還有${minutesUntil}分鐘要完成${taskName}`
   }
 
   /**

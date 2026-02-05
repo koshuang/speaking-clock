@@ -57,8 +57,8 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
   const startTask = useCallback(
     (todoId: string) => {
       const todo = todos.find((t) => t.id === todoId)
-      if (!todo || !todo.durationMinutes) {
-        console.error('Cannot start task: todo not found or no duration set')
+      if (!todo) {
+        console.error('Cannot start task: todo not found')
         return
       }
 
@@ -74,10 +74,16 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
 
       // Announce start
       const timePrefix = taskReminderTextGenerator.generateTimePrefix()
-      const startText = taskReminderTextGenerator.generateStartText(
-        todo.text,
-        todo.durationMinutes
-      )
+      let startText: string
+      if (todo.durationMinutes) {
+        startText = taskReminderTextGenerator.generateStartText(
+          todo.text,
+          todo.durationMinutes
+        )
+      } else {
+        // For tasks without duration, just announce the task name
+        startText = `開始${todo.text}`
+      }
       container.speechSynthesizer.speak(`${timePrefix}，${startText}`, voiceIdRef.current ?? undefined)
     },
     [todos]
@@ -156,7 +162,7 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
       timerRef.current = null
     }
 
-    if (!activeTask || !activeTodo || !activeTodo.durationMinutes) {
+    if (!activeTask || !activeTodo) {
       // Reset state when no active task - this is intentional initialization
       setRemainingSeconds(0)
       setProgress(0)
@@ -164,103 +170,112 @@ export function useActiveTask(todos: Todo[], voiceId?: string | null): UseActive
     }
 
     const durationMinutes = activeTodo.durationMinutes
+    const isTimedTask = !!durationMinutes
 
-    // Update remaining time and progress
+    // Update time display (remaining for timed tasks, elapsed for non-timed)
     const updateProgress = () => {
       const currentTask = activeTaskRef.current
       if (!currentTask) return
 
-      const remaining = taskDurationUseCase.getRemainingTime(
-        currentTask,
-        durationMinutes
-      )
-      const currentProgress = taskDurationUseCase.getProgress(
-        currentTask,
-        durationMinutes
-      )
-
-      setRemainingSeconds(Math.ceil(remaining / 1000))
-      setProgress(currentProgress)
-
-      // Check for checkpoints to announce (only when active)
-      if (currentTask.status === 'active') {
-        const nextCheckpoint = taskDurationUseCase.getNextCheckpoint(
+      if (isTimedTask) {
+        // Timed task: show remaining time and progress
+        const remaining = taskDurationUseCase.getRemainingTime(
+          currentTask,
+          durationMinutes
+        )
+        const currentProgress = taskDurationUseCase.getProgress(
           currentTask,
           durationMinutes
         )
 
-        if (
-          nextCheckpoint &&
-          taskDurationUseCase.shouldAnnounceCheckpoint(
-            nextCheckpoint,
+        setRemainingSeconds(Math.ceil(remaining / 1000))
+        setProgress(currentProgress)
+
+        // Check for checkpoints to announce (only when active)
+        if (currentTask.status === 'active') {
+          const nextCheckpoint = taskDurationUseCase.getNextCheckpoint(
             currentTask,
             durationMinutes
           )
-        ) {
-          let message = ''
-          const remainingMinutes = Math.ceil(remaining / 1000 / 60)
 
-          if (nextCheckpoint.type === 'progress') {
+          if (
+            nextCheckpoint &&
+            taskDurationUseCase.shouldAnnounceCheckpoint(
+              nextCheckpoint,
+              currentTask,
+              durationMinutes
+            )
+          ) {
+            let message = ''
+            const remainingMinutes = Math.ceil(remaining / 1000 / 60)
+
+            if (nextCheckpoint.type === 'progress') {
+              const currentTodo = todosRef.current.find(
+                (t) => t.id === currentTask.todoId
+              )
+              if (currentTodo) {
+                message = taskReminderTextGenerator.generateProgressText(
+                  currentTodo.text,
+                  remainingMinutes
+                )
+              }
+            } else if (nextCheckpoint.type === 'warning') {
+              const currentTodo = todosRef.current.find(
+                (t) => t.id === currentTask.todoId
+              )
+              if (currentTodo) {
+                message = taskReminderTextGenerator.generateWarningText(
+                  currentTodo.text,
+                  remainingMinutes
+                )
+              }
+            }
+
+            if (message) {
+              container.speechSynthesizer.speak(message, voiceIdRef.current ?? undefined)
+
+              // Update last announced checkpoint using functional update
+              setActiveTask((prev) => {
+                if (!prev) return prev
+                const updatedState: ActiveTaskState = {
+                  ...prev,
+                  lastAnnouncedCheckpoint: nextCheckpoint.id,
+                }
+                activeTaskRepo.save(updatedState)
+                return updatedState
+              })
+            }
+          }
+
+          // When time reaches 0, announce but don't auto-complete
+          // User needs to manually click complete button
+          if (taskDurationUseCase.isTaskComplete(currentTask, durationMinutes)) {
             const currentTodo = todosRef.current.find(
               (t) => t.id === currentTask.todoId
             )
-            if (currentTodo) {
-              message = taskReminderTextGenerator.generateProgressText(
-                currentTodo.text,
-                remainingMinutes
+            if (currentTodo && !currentTask.timeUpAnnounced) {
+              container.speechSynthesizer.speak(
+                `${currentTodo.text}，時間到了`,
+                voiceIdRef.current ?? undefined
               )
+              // Mark as announced to prevent repeated announcements
+              setActiveTask((prev) => {
+                if (!prev) return prev
+                const updatedState: ActiveTaskState = {
+                  ...prev,
+                  timeUpAnnounced: true,
+                }
+                activeTaskRepo.save(updatedState)
+                return updatedState
+              })
             }
-          } else if (nextCheckpoint.type === 'warning') {
-            const currentTodo = todosRef.current.find(
-              (t) => t.id === currentTask.todoId
-            )
-            if (currentTodo) {
-              message = taskReminderTextGenerator.generateWarningText(
-                currentTodo.text,
-                remainingMinutes
-              )
-            }
-          }
-
-          if (message) {
-            container.speechSynthesizer.speak(message, voiceIdRef.current ?? undefined)
-
-            // Update last announced checkpoint using functional update
-            setActiveTask((prev) => {
-              if (!prev) return prev
-              const updatedState: ActiveTaskState = {
-                ...prev,
-                lastAnnouncedCheckpoint: nextCheckpoint.id,
-              }
-              activeTaskRepo.save(updatedState)
-              return updatedState
-            })
           }
         }
-
-        // When time reaches 0, announce but don't auto-complete
-        // User needs to manually click complete button
-        if (taskDurationUseCase.isTaskComplete(currentTask, durationMinutes)) {
-          const currentTodo = todosRef.current.find(
-            (t) => t.id === currentTask.todoId
-          )
-          if (currentTodo && !currentTask.timeUpAnnounced) {
-            container.speechSynthesizer.speak(
-              `${currentTodo.text}，時間到了`,
-              voiceIdRef.current ?? undefined
-            )
-            // Mark as announced to prevent repeated announcements
-            setActiveTask((prev) => {
-              if (!prev) return prev
-              const updatedState: ActiveTaskState = {
-                ...prev,
-                timeUpAnnounced: true,
-              }
-              activeTaskRepo.save(updatedState)
-              return updatedState
-            })
-          }
-        }
+      } else {
+        // Non-timed task: show elapsed time (reuse remainingSeconds for elapsed)
+        const elapsed = taskDurationUseCase.getElapsedTime(currentTask)
+        setRemainingSeconds(Math.floor(elapsed / 1000))
+        setProgress(0) // No progress for non-timed tasks
       }
     }
 

@@ -10,11 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/presentation/components/ui/dropdown-menu'
-import { GripVertical, Pencil, Trash2, Check, X, Play, Pause, MoreVertical } from 'lucide-react'
+import { GripVertical, Pencil, Trash2, Check, X, Play, Pause, MoreVertical, AlarmClock } from 'lucide-react'
 import type { Todo } from '@/domain/entities/Todo'
 import { TodoIcon } from './TodoIcon'
 import { IconPicker } from './IconPicker'
 import { DurationPicker } from './DurationPicker'
+import { DeadlinePicker } from './DeadlinePicker'
 
 interface TodoItemProps {
   todo: Todo
@@ -24,7 +25,7 @@ interface TodoItemProps {
   progress?: number
   isPaused?: boolean
   onToggle: (id: string) => void
-  onUpdate: (id: string, text: string, icon?: string, durationMinutes?: number) => void
+  onUpdate: (id: string, text: string, icon?: string, durationMinutes?: number, deadline?: string) => void
   onRemove: (id: string) => void
   onStartTask?: (id: string) => void
   onPauseTask?: () => void
@@ -57,6 +58,7 @@ export function TodoItem({
   const [editText, setEditText] = useState(todo.text)
   const [editIcon, setEditIcon] = useState<string | undefined>(todo.icon)
   const [editDuration, setEditDuration] = useState<number | undefined>(todo.durationMinutes)
+  const [editDeadline, setEditDeadline] = useState<string | undefined>(todo.deadline)
 
   const {
     attributes,
@@ -75,7 +77,7 @@ export function TodoItem({
 
   const handleSave = () => {
     if (editText.trim()) {
-      onUpdate(todo.id, editText.trim(), editIcon, editDuration)
+      onUpdate(todo.id, editText.trim(), editIcon, editDuration, editDeadline)
       setIsEditing(false)
     }
   }
@@ -84,6 +86,7 @@ export function TodoItem({
     setEditText(todo.text)
     setEditIcon(todo.icon)
     setEditDuration(todo.durationMinutes)
+    setEditDeadline(todo.deadline)
     setIsEditing(false)
   }
 
@@ -95,7 +98,10 @@ export function TodoItem({
     }
   }
 
-  const showActiveState = isActive && todo.durationMinutes && onPauseTask && onResumeTask && onCompleteTask
+  // Show active state for any active task (with or without duration)
+  const showActiveState = isActive && onPauseTask && onResumeTask && onCompleteTask
+  // For tasks with duration, show remaining time; for tasks without, show elapsed time
+  const isTimedTask = !!todo.durationMinutes
 
   return (
     <div
@@ -140,6 +146,7 @@ export function TodoItem({
               aria-label="編輯待辦事項"
             />
             <DurationPicker value={editDuration} onChange={setEditDuration} compact />
+            <DeadlinePicker value={editDeadline} onChange={setEditDeadline} compact />
             <Button size="icon" variant="ghost" onClick={handleSave} aria-label="儲存" className="h-7 w-7 shrink-0">
               <Check className="h-3.5 w-3.5" />
             </Button>
@@ -167,6 +174,12 @@ export function TodoItem({
                   {todo.durationMinutes}分
                 </span>
               )}
+              {!showActiveState && todo.deadline && (
+                <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                  <AlarmClock className="h-3 w-3" />
+                  {todo.deadline}
+                </span>
+              )}
               {isNext && !todo.completed && !showActiveState && (
                 <span className="text-[10px] text-primary-foreground bg-primary px-1.5 py-0.5 rounded">
                   下次
@@ -176,8 +189,8 @@ export function TodoItem({
               {/* Active task controls */}
               {showActiveState ? (
                 <>
-                  <span className="text-xs font-medium text-primary tabular-nums">
-                    {formatTime(remainingSeconds)}
+                  <span className={`text-xs font-medium tabular-nums ${isTimedTask ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {isTimedTask ? formatTime(remainingSeconds) : `+${formatTime(remainingSeconds)}`}
                   </span>
                   <Button
                     size="icon"
@@ -200,7 +213,7 @@ export function TodoItem({
                 </>
               ) : (
                 <>
-                  {todo.durationMinutes && !todo.completed && (
+                  {!todo.completed && (
                     <Button
                       size="icon"
                       variant="ghost"
@@ -238,8 +251,8 @@ export function TodoItem({
         )}
       </div>
 
-      {/* Progress bar for active task */}
-      {showActiveState && (
+      {/* Progress bar for active timed task */}
+      {showActiveState && isTimedTask && (
         <div className="px-2 pb-2">
           <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
             <div

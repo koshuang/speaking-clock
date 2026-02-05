@@ -1,11 +1,19 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import type { Todo, TodoList } from '../../domain'
 import { container } from '../../di/container'
+import { useTodoContext } from '../contexts/TodoContext'
 
 export function useTodos() {
-  const { manageTodosUseCase, speakReminderUseCase } = container
+  const { manageTodosUseCase } = useTodoContext()
+  const { speakReminderUseCase } = container
 
   const [todoList, setTodoList] = useState<TodoList>(() => manageTodosUseCase.load())
+
+  // Reload todos when manageTodosUseCase changes (e.g., after login/logout)
+  useEffect(() => {
+    const newTodoList = manageTodosUseCase.load()
+    setTodoList(newTodoList)
+  }, [manageTodosUseCase])
 
   /**
    * 從外部設定 todos（用於即時同步）
@@ -16,18 +24,18 @@ export function useTodos() {
   }, [])
 
   const addTodo = useCallback(
-    (text: string, icon?: string, durationMinutes?: number) => {
+    (text: string, icon?: string, durationMinutes?: number, deadline?: string) => {
       if (!text.trim()) return
-      const updated = manageTodosUseCase.add(todoList, text, icon, durationMinutes)
+      const updated = manageTodosUseCase.add(todoList, text, icon, durationMinutes, deadline)
       setTodoList(updated)
     },
     [manageTodosUseCase, todoList]
   )
 
   const updateTodo = useCallback(
-    (id: string, text: string, icon?: string, durationMinutes?: number) => {
+    (id: string, text: string, icon?: string, durationMinutes?: number, deadline?: string) => {
       if (!text.trim()) return
-      const updated = manageTodosUseCase.update(todoList, id, text, icon, durationMinutes)
+      const updated = manageTodosUseCase.update(todoList, id, text, icon, durationMinutes, deadline)
       setTodoList(updated)
     },
     [manageTodosUseCase, todoList]

@@ -18,6 +18,7 @@ import {
   UltimateGoalUseCase,
   GoalReminderTextGenerator,
   TaskCompletionUseCase,
+  TaskDeadlineUseCase,
 } from '../domain/usecases'
 import {
   WebSpeechSynthesizer,
@@ -87,6 +88,7 @@ const manageStarRewardsUseCase = new ManageStarRewardsUseCase(starRewardsReposit
 const ultimateGoalUseCase = new UltimateGoalUseCase(ultimateGoalRepository)
 const goalReminderTextGenerator = new GoalReminderTextGenerator()
 const taskCompletionUseCase = new TaskCompletionUseCase()
+const taskDeadlineUseCase = new TaskDeadlineUseCase()
 
 export const container = {
   speechSynthesizer,
@@ -117,4 +119,5 @@ export const container = {
   ultimateGoalUseCase,
   goalReminderTextGenerator,
   taskCompletionUseCase,
+  taskDeadlineUseCase,
 }

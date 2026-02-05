@@ -6,6 +6,7 @@ export interface Todo {
   order: number
   createdAt: number
   durationMinutes?: number
+  deadline?: string  // Task deadline in HH:MM format
   goalId?: string  // Links this todo to an UltimateGoal
 }
 
