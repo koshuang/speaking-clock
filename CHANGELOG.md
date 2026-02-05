@@ -5,6 +5,18 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.16.0](https://github.com/koshuang/speaking-clock/compare/v1.15.0...v1.16.0) (2026-02-05)
+
+
+### Features
+
+* **sync:** enable Supabase Realtime for multi-device sync ([e259bab](https://github.com/koshuang/speaking-clock/commit/e259bab37470c682df66ad772cfc576a2590d5a5))
+
+
+### Documentation
+
+* **prd:** add realtime sync feature to PRD ([98635e5](https://github.com/koshuang/speaking-clock/commit/98635e52fbdef4a9b88dc37e175611527fdc7b21))
+
 ## [1.15.0](https://github.com/koshuang/speaking-clock/compare/v1.14.0...v1.15.0) (2026-02-05)
 
 
