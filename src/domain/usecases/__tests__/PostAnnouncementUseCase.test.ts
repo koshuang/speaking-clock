@@ -95,7 +95,7 @@ describe('PostAnnouncementUseCase', () => {
       expect(result.todo).toBe(nextTodo)
     })
 
-    it('should skip active task if no remaining time', () => {
+    it('should remind to complete when active task time is up', () => {
       const activeTodo = createTodo({ durationMinutes: 30 })
       const nextTodo = createTodo({ id: '2', text: '下一個' })
       const result = useCase.getNextAnnouncement({
@@ -105,7 +105,23 @@ describe('PostAnnouncementUseCase', () => {
         nextUncompletedTodo: nextTodo,
       })
 
+      expect(result.type).toBe('active_task')
+      expect(result.message).toContain('時間已到')
+      expect(result.message).toContain('請完成任務')
+      expect(result.todo).toBe(activeTodo)
+    })
+
+    it('should move to next todo when no active task', () => {
+      const nextTodo = createTodo({ id: '2', text: '下一個' })
+      const result = useCase.getNextAnnouncement({
+        activeTodo: null,
+        activeTaskState: null,
+        remainingSeconds: 0,
+        nextUncompletedTodo: nextTodo,
+      })
+
       expect(result.type).toBe('next_todo')
+      expect(result.todo).toBe(nextTodo)
     })
 
     it('should skip active task if no duration set', () => {

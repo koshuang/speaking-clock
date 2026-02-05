@@ -51,7 +51,7 @@ export class PostAnnouncementUseCase {
     let resultType: 'active_task' | 'next_todo' | 'goal' | 'none' = 'none'
     let resultTodo: Todo | null = null
 
-    // Priority 1: Active task that is running (not paused)
+    // Priority 1: Active task that is running (not paused) with time remaining
     if (
       activeTodo &&
       activeTodo.durationMinutes &&
@@ -64,8 +64,25 @@ export class PostAnnouncementUseCase {
       resultType = 'active_task'
       resultTodo = activeTodo
     }
-    // Priority 2: Next uncompleted todo
-    else if (nextUncompletedTodo) {
+    // Priority 2: Active task that has timed out (time <= 0) - remind to complete
+    else if (
+      activeTodo &&
+      activeTodo.durationMinutes &&
+      activeTaskState &&
+      remainingSeconds <= 0
+    ) {
+      baseMessage = `${activeTodo.text}時間已到，請完成任務`
+      resultType = 'active_task'
+      resultTodo = activeTodo
+    }
+    // Priority 3: Next uncompleted todo (but not the active timed-out task)
+    else if (nextUncompletedTodo && nextUncompletedTodo.id !== activeTodo?.id) {
+      baseMessage = this.generateNextTodoMessage(nextUncompletedTodo)
+      resultType = 'next_todo'
+      resultTodo = nextUncompletedTodo
+    }
+    // Priority 4: Next uncompleted todo without duration (non-timed task)
+    else if (nextUncompletedTodo && !nextUncompletedTodo.durationMinutes) {
       baseMessage = this.generateNextTodoMessage(nextUncompletedTodo)
       resultType = 'next_todo'
       resultTodo = nextUncompletedTodo
