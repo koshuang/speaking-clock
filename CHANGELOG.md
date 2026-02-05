@@ -5,6 +5,20 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.14.0](https://github.com/koshuang/speaking-clock/compare/v1.13.2...v1.14.0) (2026-02-05)
+
+
+### Features
+
+* **sync:** add Supabase Realtime for cross-browser sync ([c84e85e](https://github.com/koshuang/speaking-clock/commit/c84e85e2efe6432dbc9170c1130306fae72c1436))
+
+
+### Bug Fixes
+
+* **stars:** unify star state between hooks to fix non-timer task rewards ([f7bbb8a](https://github.com/koshuang/speaking-clock/commit/f7bbb8af182b6284d850dbf74de09ce0fd657882))
+* **sync:** correct callback types in useRealtimeSync ([5aa2d11](https://github.com/koshuang/speaking-clock/commit/5aa2d1100270e5b648803c36bd75932a5f17c38f))
+* **timer:** remind to complete when task time expires instead of re-announcing ([4b97ed5](https://github.com/koshuang/speaking-clock/commit/4b97ed54b75b2982062dc7911652bc51053302f4))
+
 ## [1.13.2](https://github.com/koshuang/speaking-clock/compare/v1.13.1...v1.13.2) (2026-02-04)
 
 
