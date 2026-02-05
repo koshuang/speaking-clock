@@ -10,8 +10,10 @@ export function useTodos() {
   const [todoList, setTodoList] = useState<TodoList>(() => manageTodosUseCase.load())
 
   // Reload todos when manageTodosUseCase changes (e.g., after login/logout)
+  // This is intentional - we need to reload data when switching between local/cloud repository
   useEffect(() => {
     const newTodoList = manageTodosUseCase.load()
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTodoList(newTodoList)
   }, [manageTodosUseCase])
 

@@ -108,7 +108,9 @@ npm run dev
 
 | 檔案 | 說明 |
 |------|------|
-| `001_initial_auth_tables.sql` | 建立使用者資料同步表 |
+| `20250130000000_initial_auth_tables.sql` | 建立使用者資料同步表 |
+| `20250203000000_add_ultimate_goals.sql` | 新增終極目標表 |
+| `20250206000000_enable_realtime.sql` | 啟用即時同步 |
 
 ### Migration 內容
 
@@ -117,8 +119,22 @@ npm run dev
 - `user_settings` - 使用者設定
 - `user_todos` - 待辦清單
 - `user_star_rewards` - 星星獎勵
+- `user_ultimate_goals` - 終極目標
 
 所有表格都啟用 Row Level Security (RLS)，確保使用者只能存取自己的資料。
+
+### 即時同步 (Realtime)
+
+`20250206000000_enable_realtime.sql` 啟用 Supabase Realtime，讓多裝置間可即時同步資料變更：
+
+```sql
+ALTER PUBLICATION supabase_realtime ADD TABLE user_todos;
+ALTER PUBLICATION supabase_realtime ADD TABLE user_star_rewards;
+ALTER PUBLICATION supabase_realtime ADD TABLE user_ultimate_goals;
+ALTER PUBLICATION supabase_realtime ADD TABLE user_settings;
+```
+
+**重要**：如果即時同步不工作，請確認已執行此 migration。
 
 ---
 

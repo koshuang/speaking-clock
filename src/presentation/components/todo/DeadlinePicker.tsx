@@ -21,17 +21,17 @@ export function DeadlinePicker({
   const [inputValue, setInputValue] = useState(value ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Sync input value when external value changes
-  useEffect(() => {
-    setInputValue(value ?? '');
-  }, [value]);
-
   // Focus input when entering edit mode
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isEditing]);
+
+  const startEditing = () => {
+    setInputValue(value ?? ''); // Reset to current value when starting to edit
+    setIsEditing(true);
+  };
 
   const handleConfirm = () => {
     if (inputValue && isValidTime(inputValue)) {
@@ -102,7 +102,7 @@ export function DeadlinePicker({
     <Button
       variant="outline"
       size="sm"
-      onClick={() => setIsEditing(true)}
+      onClick={startEditing}
       className={cn(
         'shrink-0 h-9 text-xs gap-1',
         compact

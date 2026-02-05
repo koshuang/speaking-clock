@@ -130,6 +130,8 @@ export class RealtimeSyncService {
     new: Record<string, unknown>
     old: Record<string, unknown>
   }): void {
+    console.log(`Realtime: ${table} ${payload.eventType}`, payload.new)
+
     const event: RealtimeChangeEvent = {
       table,
       eventType: payload.eventType,
@@ -140,6 +142,7 @@ export class RealtimeSyncService {
     // Notify all callbacks for this table
     const callbacks = this.callbacks.get(table)
     if (callbacks) {
+      console.log(`Realtime: Notifying ${callbacks.size} callbacks for ${table}`)
       callbacks.forEach((cb) => {
         try {
           cb(event)
@@ -147,6 +150,8 @@ export class RealtimeSyncService {
           console.error('Error in realtime callback:', error)
         }
       })
+    } else {
+      console.log(`Realtime: No callbacks registered for ${table}`)
     }
   }
 
