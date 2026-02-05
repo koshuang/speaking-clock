@@ -47,10 +47,11 @@ export function useRealtimeSync({
   const handleTodosChange = useCallback((event: RealtimeChangeEvent) => {
     if (event.eventType === 'DELETE') return
 
-    const data = event.newData as { todos?: Todo[] } | null
-    if (data?.todos && onTodosChangeRef.current) {
+    // Supabase stores todos as { items: Todo[] }
+    const data = event.newData as { todos?: { items: Todo[] } } | null
+    if (data?.todos?.items && onTodosChangeRef.current) {
       console.log('Realtime: Todos updated from another device')
-      onTodosChangeRef.current(data.todos)
+      onTodosChangeRef.current(data.todos.items)
     }
   }, [])
 
@@ -69,10 +70,11 @@ export function useRealtimeSync({
   const handleGoalsChange = useCallback((event: RealtimeChangeEvent) => {
     if (event.eventType === 'DELETE') return
 
-    const data = event.newData as { goals?: UltimateGoal[] } | null
-    if (data?.goals && onGoalsChangeRef.current) {
+    // Supabase stores goals as { goals: UltimateGoal[] }
+    const data = event.newData as { goals?: { goals: UltimateGoal[] } } | null
+    if (data?.goals?.goals && onGoalsChangeRef.current) {
       console.log('Realtime: Goals updated from another device')
-      onGoalsChangeRef.current(data.goals)
+      onGoalsChangeRef.current(data.goals.goals)
     }
   }, [])
 
