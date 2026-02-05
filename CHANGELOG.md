@@ -5,6 +5,19 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.15.0](https://github.com/koshuang/speaking-clock/compare/v1.14.0...v1.15.0) (2026-02-05)
+
+
+### Features
+
+* **todo:** add task deadline and elapsed time tracking ([b9d9bdd](https://github.com/koshuang/speaking-clock/commit/b9d9bdd94bc541309308659982b6775dad49e97d))
+
+
+### Bug Fixes
+
+* **deps:** update dependency @supabase/supabase-js to v2.94.1 ([#67](https://github.com/koshuang/speaking-clock/issues/67)) ([a1ab2d2](https://github.com/koshuang/speaking-clock/commit/a1ab2d2b29ffcf8ce16b43b3a5da80daad901045))
+* **sync:** correct data structure parsing in realtime sync ([74f506f](https://github.com/koshuang/speaking-clock/commit/74f506fd4752efb7526f938a13b4ba5d60d9b7e4))
+
 ## [1.14.0](https://github.com/koshuang/speaking-clock/compare/v1.13.2...v1.14.0) (2026-02-05)
 
 
