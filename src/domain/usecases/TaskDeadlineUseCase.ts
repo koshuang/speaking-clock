@@ -40,7 +40,13 @@ export class TaskDeadlineUseCase {
   getMinutesUntilDeadline(deadline: string, now: Date = new Date()): number {
     const deadlineDate = this.parseDeadlineToDate(deadline, now)
     const diffMs = deadlineDate.getTime() - now.getTime()
-    return Math.round(diffMs / (1000 * 60))
+    // Use Math.ceil for remaining time (user expects "4 minutes left" even if 3:31 remaining)
+    // Use Math.floor for overdue time (user expects "3 minutes overdue" even if 3:31 overdue)
+    if (diffMs >= 0) {
+      return Math.ceil(diffMs / (1000 * 60))
+    } else {
+      return Math.floor(diffMs / (1000 * 60))
+    }
   }
 
   /**

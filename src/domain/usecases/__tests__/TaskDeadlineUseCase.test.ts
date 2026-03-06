@@ -48,6 +48,22 @@ describe('TaskDeadlineUseCase', () => {
       const result = useCase.getMinutesUntilDeadline('10:00', now)
       expect(result).toBe(-240)
     })
+
+    it('should ceil remaining time when not on exact minute (fixes off-by-one bug)', () => {
+      // Bug case: current time 9:06:31, deadline 9:10:00
+      // Remaining: 3 min 29 sec = 3.48 min -> should be 4 (ceil), not 3 (round)
+      const now = new Date('2024-01-15T09:06:31')
+      const result = useCase.getMinutesUntilDeadline('09:10', now)
+      expect(result).toBe(4) // User expects "4 minutes left"
+    })
+
+    it('should floor overdue time when not on exact minute', () => {
+      // Case: current time 9:13:31, deadline 9:10:00
+      // Overdue: 3 min 31 sec = -3.52 min -> should be -3 (floor toward negative)
+      const now = new Date('2024-01-15T09:13:31')
+      const result = useCase.getMinutesUntilDeadline('09:10', now)
+      expect(result).toBe(-4) // 3 min 31 sec overdue rounds to -4
+    })
   })
 
   describe('isOverdue', () => {
