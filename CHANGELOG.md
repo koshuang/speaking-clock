@@ -5,6 +5,26 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.16.1](https://github.com/koshuang/speaking-clock/compare/v1.16.0...v1.16.1) (2026-03-06)
+
+
+### Bug Fixes
+
+* **deadline:** correct remaining time calculation to use ceiling ([c94185d](https://github.com/koshuang/speaking-clock/commit/c94185dc299cc729b5e6168d7225001fc8e47a9d))
+* **deps:** update dependency @supabase/supabase-js to v2.95.2 ([#71](https://github.com/koshuang/speaking-clock/issues/71)) ([d34ecea](https://github.com/koshuang/speaking-clock/commit/d34ecea146d9d7281ada5226f13a5bcf756e60d9))
+* **deps:** update dependency @supabase/supabase-js to v2.95.3 ([#75](https://github.com/koshuang/speaking-clock/issues/75)) ([2ffb6df](https://github.com/koshuang/speaking-clock/commit/2ffb6dfb749fcb142f323bbdb644920f253f8c07))
+* **deps:** update dependency @supabase/supabase-js to v2.96.0 ([#84](https://github.com/koshuang/speaking-clock/issues/84)) ([373a737](https://github.com/koshuang/speaking-clock/commit/373a737ebe9523b14012965d7cf8b691dffa433f))
+* **deps:** update dependency @supabase/supabase-js to v2.97.0 ([#86](https://github.com/koshuang/speaking-clock/issues/86)) ([6e5e431](https://github.com/koshuang/speaking-clock/commit/6e5e43178732cbaecab08202b756eb44a2f6359c))
+* **deps:** update dependency @supabase/supabase-js to v2.98.0 ([#93](https://github.com/koshuang/speaking-clock/issues/93)) ([3ebbbc0](https://github.com/koshuang/speaking-clock/commit/3ebbbc060dfd88294a67428ec46ab00f0fd4b408))
+* **deps:** update dependency lucide-react to v0.564.0 ([#82](https://github.com/koshuang/speaking-clock/issues/82)) ([e5f8055](https://github.com/koshuang/speaking-clock/commit/e5f80557d935fef6503eaea4255484479e93c574))
+* **deps:** update dependency lucide-react to v0.574.0 ([#85](https://github.com/koshuang/speaking-clock/issues/85)) ([90c1772](https://github.com/koshuang/speaking-clock/commit/90c1772d10c052beb62422d1cf484b5d65d96fdd))
+* **deps:** update dependency lucide-react to v0.575.0 ([#88](https://github.com/koshuang/speaking-clock/issues/88)) ([1bd3115](https://github.com/koshuang/speaking-clock/commit/1bd3115cc3d473d7de2dec289fd9d10908427399))
+* **deps:** update dependency lucide-react to v0.576.0 ([#98](https://github.com/koshuang/speaking-clock/issues/98)) ([db511da](https://github.com/koshuang/speaking-clock/commit/db511da726291c59645b553723d47c631f9e6105))
+* **deps:** update dependency lucide-react to v0.577.0 ([#99](https://github.com/koshuang/speaking-clock/issues/99)) ([602fb80](https://github.com/koshuang/speaking-clock/commit/602fb80815a339e223f570884d0c8ac286b4f6d3))
+* **deps:** update dependency tailwind-merge to v3.4.1 ([#81](https://github.com/koshuang/speaking-clock/issues/81)) ([0427e9f](https://github.com/koshuang/speaking-clock/commit/0427e9f617c9b5ad46260b7dc22f98bbfbc23ece))
+* **deps:** update tailwind css ([#87](https://github.com/koshuang/speaking-clock/issues/87)) ([b86660e](https://github.com/koshuang/speaking-clock/commit/b86660ed998e68d39a6e5b27df3a3ae126152ad1))
+* **deps:** update tailwind css to v4.2.1 ([#91](https://github.com/koshuang/speaking-clock/issues/91)) ([fc105f9](https://github.com/koshuang/speaking-clock/commit/fc105f9a6033997c31b8e7c0d38b1c53df8514a7))
+
 ## [1.16.0](https://github.com/koshuang/speaking-clock/compare/v1.15.0...v1.16.0) (2026-02-05)
 
 
