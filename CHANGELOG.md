@@ -5,6 +5,18 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.16.2](https://github.com/koshuang/speaking-clock/compare/v1.16.1...v1.16.2) (2026-03-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @supabase/supabase-js to v2.100.0 ([#117](https://github.com/koshuang/speaking-clock/issues/117)) ([26948a0](https://github.com/koshuang/speaking-clock/commit/26948a01a68ca27cad1440d75f1f79175dab1995))
+* **deps:** update dependency @supabase/supabase-js to v2.99.0 ([#104](https://github.com/koshuang/speaking-clock/issues/104)) ([5d91ef1](https://github.com/koshuang/speaking-clock/commit/5d91ef1eaa35a9012b2712c71645281226506456))
+* **deps:** update dependency @supabase/supabase-js to v2.99.1 ([#106](https://github.com/koshuang/speaking-clock/issues/106)) ([c87932d](https://github.com/koshuang/speaking-clock/commit/c87932df0d4d60427f60b626226d33a85572747e))
+* **deps:** update dependency @supabase/supabase-js to v2.99.2 ([#111](https://github.com/koshuang/speaking-clock/issues/111)) ([8ea5c57](https://github.com/koshuang/speaking-clock/commit/8ea5c5760a787bd0d11aa9dbb48bc341f0efe77f))
+* **deps:** update dependency @supabase/supabase-js to v2.99.3 ([#113](https://github.com/koshuang/speaking-clock/issues/113)) ([5f9007b](https://github.com/koshuang/speaking-clock/commit/5f9007bf465ccff48a07e57eee436b93b6c883ce))
+* **deps:** update tailwind css to v4.2.2 ([#112](https://github.com/koshuang/speaking-clock/issues/112)) ([189058f](https://github.com/koshuang/speaking-clock/commit/189058fafad62b2f4c7fdc791bd4866fa2ecee72))
+
 ## [1.16.1](https://github.com/koshuang/speaking-clock/compare/v1.16.0...v1.16.1) (2026-03-06)
 
 
