@@ -5,6 +5,15 @@
 格式基於 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.0.0/)，
 版本號遵循 [Semantic Versioning](https://semver.org/lang/zh-TW/)。
 
+## [1.16.3](https://github.com/koshuang/speaking-clock/compare/v1.16.2...v1.16.3) (2026-04-05)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @supabase/supabase-js to v2.100.1 ([#123](https://github.com/koshuang/speaking-clock/issues/123)) ([c3eb7a3](https://github.com/koshuang/speaking-clock/commit/c3eb7a36f0c62df7070dcadb06876749cf7d5515))
+* **deps:** update dependency @supabase/supabase-js to v2.101.0 ([#126](https://github.com/koshuang/speaking-clock/issues/126)) ([5675e16](https://github.com/koshuang/speaking-clock/commit/5675e161422a7fba35ef7f2f7596ec12af3284bf))
+* **deps:** update dependency @supabase/supabase-js to v2.101.1 ([#128](https://github.com/koshuang/speaking-clock/issues/128)) ([f5f1f97](https://github.com/koshuang/speaking-clock/commit/f5f1f97b7f1debfa9e03e61c212f94e380dd7906))
+
 ## [1.16.2](https://github.com/koshuang/speaking-clock/compare/v1.16.1...v1.16.2) (2026-03-24)
 
 
